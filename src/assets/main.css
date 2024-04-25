@@ -4,6 +4,7 @@
 body {
   font-family: 'Open Sans', sans-serif;
   transition: all .5s ease;
+
   /* overflow-y: hidden; */
 }
 .btn {
@@ -17,4 +18,7 @@ body {
   cursor: pointer;
   transition: background-color 0.3s ease;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shaddov qo'shish */
+}
+.dark .darkClass {
+  background-color: #121212;
 }

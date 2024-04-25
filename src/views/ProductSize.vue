@@ -1,6 +1,10 @@
 <template>
-  <div class="">
-    <div class="flex justify-end"> 
+  <div class=" overflow-y-auto h-full prouductSize" >
+    <div class="flex items-center sticky top-0 z-50  bg-white w-full darkClass">
+        <img src="@/assets/imgs/logo.png" alt="" class=" h-[80px] ">
+        <h1 class="text-center text-2xl font-bold text-[#6A984D]">Bozorligim</h1>
+      </div>
+    <div class="flex justify-end pr-3" > 
       <el-icon size="20px" color="#6A984D" @click="$emit('hide')">
               <CloseBold />
             </el-icon></div>
@@ -11,17 +15,22 @@
 
     <h1 class="mb-2  text-[18px]"> {{ props.selectProductType.name }}</h1>
     <hr />
-    <div class="border p-2 mt-3   rounded">
+
+
+    <!-- input radio -->
+    <div class="border p-2 mt-3 overflow-y-auto min-h-[100px]  rounded">
 
       <h2>{{ props.selectProductType.criterion }}</h2>
-      <div v-for="(item, idx) in props.selectProductType.productSize" :key="idx" class=" flex items-center">
+      <div v-for="(item, idx) in props.selectProductType.productSize" :key="idx" class=" flex items-center ">
 
-        <input type="radio" id="html" name="fav_language" v-model="radio" :value="item">
-        <label :for="item" class="m-1  text-[14px]">{{ item }} <span class="ml-[2px]">{{
+        <input type="radio" :id="idx"  v-model="radio" :value="item">
+        <label :for="idx" class="m-1  text-[14px]  w-full">{{ item }} <span class="ml-[2px]">{{
           props.selectProductType.criterion
         }}</span></label><br>
 
       </div>
+
+
     </div>
     <p class="mt-3 mb-1">Narxi: {{ props.selectProductType.price }}</p>
     <p>Jami: {{ props.selectProductType.price*props.selectProductType.count }}</p>
@@ -93,4 +102,10 @@ watch(() => props.selectProductType, (newValue) => {
 
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped>
+.prouductSize::-webkit-scrollbar {
+  display: none;
+}
+
+    
+</style>

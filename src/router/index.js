@@ -18,10 +18,31 @@ const router = createRouter({
       component: () => import('../views/Basket.vue')
     },
     {
-      path: '/carousel',
-      name: 'carousel',
-      component: () => import('@/views/carousel.vue')
-    }
+      path: '/order',
+      name: 'order',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('../views/Order.vue')
+    },
+    {
+      path: '/success',
+      name: 'success',
+      // route level code-splitting
+      // this generates a separate chunk (About.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import('../views/Success.vue')
+    },
+   
   ]
 })
+
+router.beforeEach((to, from, next) => {
+  if (to.path === '/') {
+    document.body.style.overflowY = 'hidden';
+  } else {
+    document.body.style.overflowY = 'auto';
+  }
+  next();
+});
 export default router

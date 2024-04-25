@@ -2,15 +2,10 @@
   <div>
     <header>
 
-      <div class="mainContainer h-[100vh]">
-        <div class="flex items-center h-[10vh]  ">
-          <img src="@/assets/imgs/logo.png" alt="" class="w-[80px] ">
-          <h1 class="text-center text-2xl font-bold text-[#6A984D]">Bozorligim</h1>
-        </div>
-        <div class="h-[86vh] overflow-y-auto content  ">
+      <div class="mainContainer">
+       
           <RouterView />
 
-        </div>
       </div>
     </header>
 
@@ -21,6 +16,7 @@
 <script setup>
 import { onMounted } from 'vue';
 
+
 onMounted(() => {
   const html = document.getElementsByTagName('html')
   if (window.Telegram.WebApp.colorScheme == 'light') {
@@ -28,6 +24,9 @@ onMounted(() => {
   } else {
     html[0].classList.add('dark')
   }
+
+
+ 
 })
 
 
@@ -52,13 +51,11 @@ header {
 .mainContainer {
   width: 30%;
   border-radius: 10px;
-  padding: 20px;
+  padding: 0 20px;
 
 }
 
-.content::-webkit-scrollbar {
-  display: none;
-}
+
 
 @media screen and (max-width: 960px) {
   .mainContainer {

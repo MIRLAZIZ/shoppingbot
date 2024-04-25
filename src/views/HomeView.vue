@@ -1,12 +1,11 @@
 <script setup>
 
-import { ElRow, ElCol, ElCard, ElButton, ElIcon } from 'element-plus'
-import 'element-plus/dist/index.css'
+import { ElIcon } from 'element-plus'
 import { onMounted, ref } from 'vue';
 import cola from '@/assets/imgs/cola.jpg'
 import pitsa from '@/assets/imgs/pitsa.jpg'
 import pitsa2 from '@/assets/imgs/pizza-png-15.png'
-import Carousel from '@/views/carousel.vue'
+
 import ProductSize from '@/views/ProductSize.vue'
 import { useHomeStore } from '@/stores/home.js'
 const store = useHomeStore()
@@ -64,714 +63,7 @@ const categorys = ref([
   }
 
 ])
-const productData = ref({
-  pitsa: [{
-    id: 1,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'pitsa',
-    criterion: 'kg',
-    is_basket: false,
-    productSize: null,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
 
-
-  },
-  {
-    id: 2,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'pitsa',
-    criterion: 'kg',
-    is_basket: false,
-    productSize: null,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-
-  },
-  {
-    id: 3,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'pitsa',
-    productSize: ['25', '50',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-
-  }, {
-    id: 4,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'pitsa',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-
-  }, {
-    id: 5,
-    name: 'pitsa',
-    img: pitsa2,
-    productName: 'Pitsa',
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'pitsa',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-
-
-  }, {
-    id: 6,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'pitsa',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-
-  }, {
-    id: 7,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'pitsa',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-  }],
-
-  ichimlik: [
-
-    {
-      id: 1,
-      name: 'cola',
-      img: cola,
-      subtitre: 'lorem ipsum dolor sit amet',
-      price: 200,
-      type: 'ichimlik',
-      criterion: 'dona',
-      is_basket: false,
-      productSize: [150, 200],
-      count: 1,
-      criterionNumber: 1,
-      totlCount: 200
-
-
-
-
-
-    },
-    {
-      id: 2,
-      name: 'cola',
-      img: cola,
-      subtitre: 'lorem ipsum dolor sit amet',
-      price: 200,
-      type: 'ichimlik',
-      criterion: 'kg',
-      is_basket: false,
-      productSize: null,
-      count: 1,
-      criterionNumber: 1,
-      totlCount: 200
-
-
-
-
-    },
-    {
-      id: 3,
-      name: 'cola',
-      img: cola,
-      subtitre: 'lorem ipsum dolor sit amet',
-      price: 200,
-      type: 'ichimlik',
-      criterion: 'kg',
-      is_basket: false,
-      productSize: null,
-      count: 1,
-      criterionNumber: 1,
-      totlCount: 200
-
-
-
-
-    },
-    {
-      id: 4,
-      name: 'cola',
-      img: cola,
-      subtitre: 'lorem ipsum dolor sit amet',
-      price: 200,
-      type: 'ichimlik',
-      criterion: 'kg',
-      is_basket: false,
-      productSize: null,
-      count: 1,
-      criterionNumber: 1,
-      totlCount: 200
-
-
-
-
-    },
-    {
-      id: 5,
-      name: 'cola',
-      img: cola,
-      subtitre: 'lorem ipsum dolor sit amet',
-      price: 200,
-      type: 'ichimlik',
-      criterion: 'kg',
-      is_basket: false,
-      productSize: null,
-      count: 1,
-      criterionNumber: 1,
-      totlCount: 200
-
-
-
-
-    }],
-  sushi: [{
-    id: 1,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'sushi',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-  },
-  {
-    id: 2,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'sushi',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-  },
-  {
-    id: 3,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'sushi',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-
-  }, {
-    id: 4,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'sushi',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-
-  }, {
-    id: 5,
-    name: 'pitsa',
-    img: pitsa2,
-    productName: 'Pitsa',
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'sushi',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-
-  }, {
-    id: 6,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'sushi',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-  }, {
-    id: 7,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'sushi',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-  }],
-
-  shashlik: [{
-    id: 1,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'shashlik',
-    criterion: 'kg',
-    is_basket: false,
-    productSize: null,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-  },
-  {
-    id: 2,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'shashlik',
-    criterion: 'kg',
-    is_basket: false,
-    productSize: null,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-  },
-  {
-    id: 3,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'shashlik',
-    criterion: 'kg',
-    is_basket: false,
-    productSize: null,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-  }, {
-    id: 4,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'shashlik',
-    criterion: 'kg',
-    is_basket: false,
-    productSize: null,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-  }, {
-    id: 5,
-    name: 'pitsa',
-    img: pitsa2,
-    productName: 'Pitsa',
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'shashlik',
-    criterion: 'kg',
-    is_basket: false,
-    productSize: null,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-  }, {
-    id: 6,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'pitsa',
-    criterion: 'kg',
-    is_basket: false,
-    productSize: null,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-  }, {
-    id: 7,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'pitsa',
-    criterion: 'kg',
-    is_basket: false,
-    productSize: null,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-  }],
-  don: [{
-    id: 1,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'shashlik',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-  },
-  {
-    id: 2,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'shashlik',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-
-  },
-  {
-    id: 3,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'shashlik',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-
-  }, {
-    id: 4,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'shashlik',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-
-  }, {
-    id: 5,
-    name: 'pitsa',
-    img: pitsa2,
-    productName: 'Pitsa',
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'shashlik',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-
-  }, {
-    id: 6,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'pitsa',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-  }, {
-    id: 7,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'pitsa',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-  }],
-  un: [{
-    id: 1,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'shashlik',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-  },
-  {
-    id: 2,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'shashlik',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-
-  },
-  {
-    id: 3,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'shashlik',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-
-
-  }, {
-    id: 4,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'shashlik',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-
-  }, {
-    id: 5,
-    name: 'pitsa',
-    img: pitsa2,
-    productName: 'Pitsa',
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'shashlik',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-
-  }, {
-    id: 6,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'pitsa',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-
-
-
-  }, {
-    id: 7,
-    name: 'pitsa',
-    img: pitsa2,
-    subtitre: 'lorem ipsum dolor sit amet',
-    price: 200,
-    type: 'pitsa',
-    productSize: ['25', '25',],
-    criterion: 'kg',
-    is_basket: false,
-    count: 1,
-    criterionNumber: 1,
-    totlCount: 200
-
-  }]
-
-
-})
 const prodductType = ref(true)
 
 const categoryActive = (id) => {
@@ -813,20 +105,8 @@ onMounted(() => {
 
 const handleProductDataScroll = () => {
 
-    document.getElementById('category' + acteveCategory.value).scrollIntoView(true, { behavior: 'smooth', block: "start" });
-  // document.getElementById('category' + acteveCategory.value).scrollIntoView(true, { behavior: 'smooth',  block: "center"});
+  document.getElementById('category' + acteveCategory.value).scrollIntoView(true, { behavior: 'smooth', block: "start" });
 
-  // const productDataElements = document.querySelectorAll('.productCategory');
-  // productDataElements.forEach((element, index) => {
-  //   const rect = element.getBoundingClientRect();
-
-
-
-  //   if (rect.top <= 0 && rect.bottom <= window.innerHeight) {
-  //     // let elementId = element.getAttribute('id');
-  //     // document.getElementById('category' + acteveCategory.value).scrollIntoView({ behavior: 'smooth', block: 'start' });
-  //   }
-  // });
 };
 const selectProductType = ref()
 const prodductAddbasket = item => {
@@ -852,69 +132,41 @@ const prodductAddbasket = item => {
 
 <template>
   <!-- <Carousel/> -->
-  <div class="relative  w-full  ">
-  
-
-
+  <div class="relative    ">
     <div class="h-full w-full bg-white  darkClass z-10  absolute transition-all duration-[.5s] "
       :class="{ productSizewidth: prodductType }">
       <ProductSize @hide="prodductType = true" :selectProductType="selectProductType"
         class="opacity-1 transition-all duration-[.5s]" :class="{ productSizewidthContent: prodductType }" />
     </div>
-
-    <!-- category -->
-    <div class="flex overflow-x-auto category  ">
-
-      <a v-for="item in categorys" :key="item.id" :class="{ 'active': acteveCategory == item.procut_id }"
-        :style="`margin-left:${item.id === 1 ? '0px' : '10px'}`" @click=categoryActive(item.procut_id)
-        class="p-2 categoryData border  ml-2" :href="`#${item.procut_id}`" :id="'category' + item.procut_id">
-        <div class=" flex items-center justify-center ">
-          <div>
+     
+    <div class="h-auto  py-3">
+      <div class="flex items-center">
+        <img src="@/assets/imgs/logo.png" alt="" class=" h-[80px] ">
+        <h1 class="text-center text-2xl font-bold text-[#6A984D]">Bozorligim</h1>
+      </div>
 
 
-            <div class="flex items-center justify-center"><img :src="item.img" alt="" class="categoryImg"></div>
+      <!-- category -->
+      <div class="flex overflow-x-auto category  ">
 
-            <div class=" text-center "> <small class="font-medium">{{ item.name }} {{ acteveCategory }}</small></div>
+        <a v-for="item in categorys" :key="item.id" :class="{ 'active': acteveCategory == item.procut_id }"
+          :style="`margin-left:${item.id === 1 ? '0px' : '10px'}`" @click=categoryActive(item.procut_id)
+          class="p-2 categoryData border  ml-2" :href="`#${item.procut_id}`" :id="'category' + item.procut_id">
+          <div class=" flex items-center justify-center ">
+            <div>
 
+
+              <div class="flex items-center justify-center"><img :src="item.img" alt="" class="categoryImg"></div>
+
+              <div class=" text-center "> <small class="font-medium">{{ item.name }}</small></div>
+
+            </div>
           </div>
-        </div>
-      </a>
-
-    </div>
-
-
-    <!-- karzinka and aksiya -->
-    <!-- <div class="grid gap-4 grid-cols-2 mt-3 ">
-    <div class=" border rounded-[10px] px-2 karzinka flex justify-between" @click="$router.push('/carousel')">
-      <div class="p-2">Aksiya</div>
-      <div><img src="@/assets/imgs/aksiya.png" alt="" style="width:60px;"></div>
-    </div>
-
-
-
-
-
-    <div class="px-2 rounded-[10px] border karzinka " @click="$router.push('/basket')">
-      <div class="flex  justify-between">
-        <div class="p-2">
-          <p>
-            Karzinka
-          </p>
-          <p>0 dona</p>
-        </div>
-        <img src="@/assets/imgs/karzinka2.png" alt="" style="width:60px;">
+        </a>
 
       </div>
 
     </div>
-
-  </div> -->
-
-
-
-
-
-
 
 
 
@@ -923,7 +175,7 @@ const prodductAddbasket = item => {
 
 
     <!-- products data  -->
-    <div class="  overflow-y-auto  productsData   relative " @scroll="handleProductDataScroll">
+    <div class="  overflow-y-scroll  productsData  h-[67vh] pb-16 relative " @scroll="handleProductDataScroll">
       <button class="fixed bottom-6 right-6 bg-[#6A984D] w-12 h-12 rounded-full " @click="$router.push('/basket')"> <img
           src="@/assets/imgs/karzinka2.png" alt="">
         <small
@@ -934,11 +186,11 @@ const prodductAddbasket = item => {
       <div v-for="category in categorys" :key="category.id" :id="category.procut_id" class="productCategory ">
 
 
-        <h1 class="font-bold text-[#6A984D] text-1xl" v-if="productData[category.type]">{{ category.name }}</h1>
+        <h1 class="font-bold text-[#6A984D] text-1xl" >{{ category.name }}</h1>
 
 
 
-        <div class="  p-2 mt-3" v-for="item in productData[category.type]" :key="item.id">
+        <div class="  p-2 mt-3" v-for="item in store.productData[category.type]" :key="item.id">
 
           <div class="flex">
             <!-- img  -->
@@ -1028,10 +280,11 @@ const prodductAddbasket = item => {
 </template>
 
 <style scoped>
-.dark .darkClass {
-  color: #fff;
-  background-color: #121212;
-}
+/* body {
+  overflow-y: hidden;
+
+} */
+
 
 .categoryImg {
   width: 40px;
@@ -1046,6 +299,8 @@ const prodductAddbasket = item => {
 
   /* scroll-behavior: smooth; */
   transition: all 0.5s;
+  touch-action: pan-y !important;
+
 
 }
 
@@ -1074,10 +329,7 @@ const prodductAddbasket = item => {
   scroll-behavior: smooth;
 }
 
-.productsData {
-  /* scroll-behavior: smooth; */
-  height: calc(85vh - 82px);
-}
+
 
 .productsData::-webkit-scrollbar {
   display: none;
