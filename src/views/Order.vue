@@ -11,10 +11,7 @@
 
 
         </div>
-
-
-
-
+        
         <el-form label-position="top">
 
 
@@ -50,8 +47,8 @@
         </el-form>
 
         <div class="flex justify-end">
-            <button @click="resetForm" class="btn bg-red-500 py-1">bekor qilish</button>
-            <button @click="sendData" class="btn ml-3 py-1">Submit</button>
+            <button @click="resetForm" class="btn bg-red-500 py-1">Orqaga</button>
+            <button @click="sendData" class="btn ml-3 py-1">Ma'lumotlarni yuborish</button>
         </div>
 
 
@@ -74,6 +71,8 @@ const userData = ref({
     phone: '',
     peyment_type: null,
     comment: null,
+    orderData: store.orderData
+
 })
 const phoneValidation = () => {
     userData.value.phone ? phoneRequired.value = null : phoneRequired.value = 'Telefon raqam kiriting'
@@ -83,20 +82,6 @@ const peymentValidation = () => {
     userData.value.peyment_type ? requiredPeymentType.value = null : requiredPeymentType.value = 'To\'lov turi tanlang'
 
 }
-// const formatPhoneNumber = (phoneNumber) => {
-//     if (!phoneNumber) return '+998'; // Telefon raqami mavjud emas bo'lsa +998 ni qaytarish
-
-//     // Telefon raqamini formatlash
-//     phoneNumber = phoneNumber.replace(/^\+998|\D/g, ''); // +998 ni olib tashlash
-//     return phoneNumber.replace(/^(\d{1,2})(\d{1,3})?(\d{1,2})?(\d{1,2})?.*/, (m, g1, g2, g3, g4) => {
-//         // Formatlanmagan raqamda bo'sh joylar qo'shib berish
-//         let formattedNumber = `+998 (${g1})`;
-//         if (g2) formattedNumber += `-${g2}`;
-//         if (g3) formattedNumber += `-${g3}`;
-//         if (g4) formattedNumber += `-${g4}`;
-//         return formattedNumber;
-//     });
-// };
 
 
 
@@ -132,14 +117,18 @@ const sendData = () => {
     phoneValidation()
     peymentValidation()
     if (!phoneRequired.value && !requiredPeymentType.value) {
-        console.log(userData.value);
-        console.log(store.basket);
-        console.log(typeof store.basket);
-        
+        store.createOrder(userData.value)
+            .then((res) => {
+                console.log(res);
+                store.basket = []
+                userData.value = {}
+                router.push('/success')
 
-        store.basket = []
-        userData.value = {}
-        router.push('/success')
+
+            })
+
+
+
 
 
     }
@@ -149,7 +138,8 @@ const sendData = () => {
 }
 
 const resetForm = () => {
-    console.log('reset!');
+    router.push('basket')
+
 
 
 }

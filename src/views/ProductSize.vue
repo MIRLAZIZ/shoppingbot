@@ -1,59 +1,92 @@
 <template>
-  <div class=" overflow-y-auto h-full prouductSize" >
-    <div class="flex items-center sticky top-0 z-50  bg-white w-full darkClass">
-        <img src="@/assets/imgs/logo.png" alt="" class=" h-[80px] ">
+  <div class=" overflow-y-scroll h-screen  prouductSize"
+    v-if="props.selectProductType && props.selectProductType.variants">
+
+    <!-- headeer -->
+    <div class=" sticky top-0 z-50  bg-white w-full darkClass">
+      <div class="flex items-center"><img src="@/assets/imgs/logo.png" alt="" class=" h-[80px] ">
         <h1 class="text-center text-2xl font-bold text-[#6A984D]">Bozorligim</h1>
       </div>
-    <div class="flex justify-end pr-3" > 
-      <el-icon size="20px" color="#6A984D" @click="$emit('hide')">
-              <CloseBold />
-            </el-icon></div>
-    <div class="flex items-center justify-center  rounded">
-      <img :src="props.selectProductType.img" alt="" class="w-[150px]" />
+
+      <!-- cancel -->
+      <div class="flex justify-end pr-3">
+        <el-icon size="20px" color="#6A984D" @click="$emit('hide')">
+          <CloseBold />
+        </el-icon>
+      </div>
+    </div>
+
+
+
+
+    <!-- product img  -->
+    <div class="flex items-center justify-center  rounded"
+      v-if="props.selectProductType && props.selectProductType.variants">
+      <img :src="props.selectProductType.variants[variantIndex].images[0].image" alt="" class="w-[150px]" v-if="props.selectProductType.variants[variantIndex].images[0]?.image" />
+
+      <img src="@/assets/imgs/noImg.png" alt="" v-else class="productImg">
+
 
     </div>
 
-    <h1 class="mb-2  text-[18px]"> {{ props.selectProductType.name }}</h1>
+    <!-- product name  -->
+    <h1 class="mb-2  text-[18px]"> {{ props.selectProductType?.name }}</h1>
     <hr />
 
 
     <!-- input radio -->
     <div class="border p-2 mt-3 overflow-y-auto min-h-[100px]  rounded">
 
-      <h2>{{ props.selectProductType.criterion }}</h2>
-      <div v-for="(item, idx) in props.selectProductType.productSize" :key="idx" class=" flex items-center ">
+      <div v-for="(item, idx) in props.selectProductType.variants" :key="idx" class=" flex items-center   "
+        @click="variantIndex = idx">
 
-        <input type="radio" :id="idx"  v-model="radio" :value="item">
-        <label :for="idx" class="m-1  text-[14px]  w-full">{{ item }} <span class="ml-[2px]">{{
-          props.selectProductType.criterion
-        }}</span></label><br>
+        <input type="radio" :id="idx" v-model="radio" :value="item.weight" :checked="idx === variantIndex">
+        <label :for="idx" class="m-1  text-[14px]  w-full">{{ item.weight }} <span class="ml-[2px]">{{
+          item.criterion
+            }}</span></label><br>
 
       </div>
 
-
+      <!-- price and total price  -->
     </div>
-    <p class="mt-3 mb-1">Narxi: {{ props.selectProductType.price }}</p>
-    <p>Jami: {{ props.selectProductType.price*props.selectProductType.count }}</p>
+    <p class="mt-3 mb-1">Narxi: {{ props.selectProductType.variants[variantIndex].price }}</p>
+    <p>Jami:
+      {{ totalPrice }}
+    </p>
 
     <div class="mt-3 flex   justify-between">
       <div class=" w-[40%] flex justify-between items-center">
-        <button class="btn "  @click="props.selectProductType.count--">
+
+        <!-- count --  -->
+        <button class="btn py-2 " size="large" @click="minusCount">
           <el-icon class="el-icon">
             <Minus />
           </el-icon>
-        </button> <span>{{ props.selectProductType.count }} </span>
-        <button class="btn"  @click="props.selectProductType.count++"><el-icon color="#fff" >
+        </button>
+
+        <!-- product count  -->
+        <span>{{ elementFind ? elementFind.variants[0].count : props.selectProductType.variants[variantIndex].count }}
+        </span>
+
+        <!-- count ++ -->
+        <button class="btn py-2" size="large" @click="addCount" :disabled="totalproduct"><el-icon color="#fff">
             <Plus />
           </el-icon></button>
       </div>
       <div class=" w-[60%] pl-1">
-        <button class="btn w-full text-white py-2" size="large" @click="send">
+
+        <!-- baseket add  -->
+        <button class="btn w-full text-white py-2" size="large" @click="send"
+          :disabled="store.basket.some(el => el.variants[0].id === props.selectProductType.variants[variantIndex].id)">
+
           Tasdiqlash
         </button>
+
       </div>
 
 
     </div>
+
 
 
 
@@ -62,9 +95,8 @@
 </template>
 
 <script setup>
-import pitsa2 from '@/assets/imgs/pizza-png-15.png'
 import { useHomeStore } from '@/stores/home.js'
-import { onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 
 const store = useHomeStore()
@@ -76,29 +108,144 @@ const props = defineProps({
 })
 const radio = ref()
 const emit = defineEmits(['hide'])
+
+const variantIndex = ref(0)
+const totalproduct = ref(false)
+
+const elementFind = computed(() => store.basket.find(el => el.variants[0].id === props.selectProductType.variants[variantIndex.value].id))
+
+
+const totalPrice = computed(() => {
+  if (elementFind.value) {
+    return elementFind.value.variants[0].count * elementFind.value.variants[0].price
+  }
+  else {
+    return props.selectProductType.variants[variantIndex.value].count * props.selectProductType.variants[variantIndex.value].price
+  }
+})
 const send = () => {
-  props.selectProductType.criterionNumber = radio.value
-  store.basket.push(props.selectProductType)
+
+
+  let data = {
+    id: props.selectProductType.id,
+    name: props.selectProductType.name,
+    variants: [props.selectProductType.variants[variantIndex.value]]
+  }
+  store.basket.push(data)
   emit('hide')
 }
 
+const addCount = () => {
+  let elemetntTrue = store.basket.some(el => el.variants[0].id === props.selectProductType.variants[variantIndex.value].id)
+  if (elemetntTrue) {
+    let element = store.basket.find(el => el.variants[0].id === props.selectProductType.variants[variantIndex.value].id)
+    element.variants[0].count++
+
+
+    element.variants[0].product_warehouse_total == element.variants[0].count ? totalproduct.value = true : totalproduct.value = false
 
 
 
-watch(() => props.selectProductType, (newValue) => {
-    radio.value = newValue.productSize[0];
-  
-}, { deep: true });
+  }
+  else {
+    props.selectProductType.variants[variantIndex.value].count++
+
+    props.selectProductType.variants[variantIndex.value].count == props.selectProductType.variants[variantIndex.value].product_warehouse_total ? totalproduct.value = true : totalproduct.value = false
+  }
+}
+
+
+// const minusCount = () => {
+//   // props.selectProductType.variants[variantIndex.value] orqali variantni topamiz
+
+//   const variantId = props.selectProductType.variants[variantIndex.value].id;
+
+//   // store.basket ichidan kerakli elementni topamiz
+//   let element = store.basket.find(el => el.variants[0].id === variantId);
+
+//   let parentElement = store.basket.some(el => el.id === props.selectProductType.id)
 
 
 
-// onMounted(() => {
-//   if(props.selectProductType && props.selectProductType.productSize) {
-//     radio.value = props.selectProductType.productSize[0]
+//   // element mavjudligini tekshiramiz
+//   if (parentElement) {
+//     // Agar elementning count 1 bo'lsa, uni store.basket dan olib tashlaymiz
+//     if (element && element.variants[0].count === 1) {
+//       store.basket = store.basket.filter(basketItem => basketItem.variants[0].id !== variantId);
 
+
+
+//     } else {
+//       // Aks holda, count ni kamaytiramiz
+//       if (element) {
+//         element.variants[0].count--;
+//         if (element.variants[0].count < element.variants[0].product_warehouse_total - 90) {
+//           totalproduct.value = false
+
+//         }
+
+//       }
+
+//     }
+//   } else {
+//     // Agar element topilmasa, props.selectProductType.variants[variantIndex.value] ni kamaytiramiz
+//     if (props.selectProductType.variants[variantIndex.value].count > 1) {
+//       props.selectProductType.variants[variantIndex.value].count--;
+//       if (props.selectProductType.variants[variantIndex.value].count < props.selectProductType.variants[variantIndex.value].product_warehouse_total - 90) {
+//         totalproduct.value = false
+
+//       }
+
+//     } else {
+//       props.selectProductType.variants[variantIndex.value].count = 1
+
+
+//     }
 //   }
-  
-// })
+// };
+
+
+
+
+
+const minusCount = () => {
+  const { selectProductType } = props;
+  const variantIndexValue = variantIndex.value;
+  const selectedVariant = selectProductType.variants[variantIndexValue];
+  const variantId = selectedVariant.id;
+  const parentElementExists = store.basket.some(el => el.id === selectProductType.id);
+  const basketElement = store.basket.find(el => el.variants[0].id === variantId);
+
+  if (parentElementExists) {
+    if (basketElement) {
+      const basketVariant = basketElement.variants[0];
+      
+      if (basketVariant.count === 1) {
+        store.basket = store.basket.filter(basketItem => basketItem.variants[0].id !== variantId);
+      } else {
+        basketVariant.count--;
+        if (basketVariant.count < basketVariant.product_warehouse_total ) {
+          totalproduct.value = false;
+        }
+      }
+    }
+  } else {
+    if (selectedVariant.count > 1) {
+      selectedVariant.count--;
+      if (selectedVariant.count < selectedVariant.product_warehouse_total) {
+        totalproduct.value = false;
+      }
+    } else {
+      selectedVariant.count = 1;
+    }
+  }
+};
+
+
+
+
+
+
 
 </script>
 
@@ -106,6 +253,4 @@ watch(() => props.selectProductType, (newValue) => {
 .prouductSize::-webkit-scrollbar {
   display: none;
 }
-
-    
 </style>

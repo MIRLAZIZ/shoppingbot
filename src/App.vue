@@ -18,6 +18,7 @@ import { onMounted } from 'vue';
 
 
 onMounted(() => {
+  // console.log(window.Telegram.WebApp.themeParams)
   const html = document.getElementsByTagName('html')
   if (window.Telegram.WebApp.colorScheme == 'light') {
     html[0].classList.remove('dark')

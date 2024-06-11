@@ -1,44 +1,40 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
-import { ElButton } from 'element-plus'
+import { ref } from 'vue';
 import { useHomeStore } from '@/stores/home.js'
-import Order from './Order.vue';
 import { useRouter } from 'vue-router'
 const store = useHomeStore()
 const router = useRouter()
 
-const is_basket = ref(true)
-const summ = ref(0)
-const is_order = ref(true)
+const code = ref(null)
 
+const totalSum = ref(false)
 
-onMounted(() => {
-  if (store.basket.length == 0) {
-    is_basket.value = false
-  }
-  // store.basket  count * price = totalCount then all totalCount + totalCount= sum function
-  let sum = 0
-  store.basket.forEach(item => {
-    item.totlCount = item.count * item.price
-    sum += item.totlCount
-  })
-  summ.value = sum
-
-})
-// store.basket  count * price = totalCount then all totalCount + totalCount= sum function watch
-watch(() => store.basket, (newValue) => {
-
-  let sum = 0
-  store.basket.forEach(item => {
-    item.totlCount = item.count * item.price
-    sum += item.totlCount
-  })
-  summ.value = sum
-
-}, { deep: true });
 
 const sendOrder = () => {
-  router.push('/order')
+  if (totalPrice() < 150000) {
+    totalSum.value = true
+  }
+  else {
+    store.orderData = []
+    store.basket.forEach(item => {
+      store.orderData.push({ id: item.id, variantsId: item.variants[0].id, count: item.variants[0].count })
+    })
+    router.push('/order')
+
+  }
+}
+
+const sendPromoCode =  () => {
+  store.promoCode(code.value)
+  .then(res => {
+    console.log(res);
+  })
+}
+
+// totalPrice 
+
+const totalPrice = () => {
+  return store.basket.reduce((a, b) => a + b.variants[0].price * b.variants[0].count, 0)
 }
 
 const homePage = () => {
@@ -49,110 +45,134 @@ const homePage = () => {
 <template>
   <div class="relative">
 
-    
 
- 
-   
+
+
 
     <!-- logo -->
-    <div class="sticky top-0 z-10  bg-white w-full darkClass">
-    <div class="flex items-center" >
-      <img src="@/assets/imgs/logo.png" alt="" class=" h-[80px] ">
-      <h1 class="text-center text-2xl font-bold text-[#6A984D]">Bozorligim</h1>
+    <div class=" w-full sticky ">
+      <div class="flex items-center">
+        <img src="@/assets/imgs/logo.png" alt="" class=" h-[80px] ">
+        <h1 class="text-center text-2xl font-bold text-[#6A984D]">Bozorligim</h1>
+      </div>
+
+      <div class="flex justify-center">
+
+        <div class="" @click="homePage"><el-icon size="30px" color="#6A984D">
+            <ArrowLeft />
+          </el-icon></div>
+
+
+        <h1 class=" w-80 text-center text-2xl ">Savatcha</h1>
+      </div>
+
+    </div>
+    <!-- <pre>{{ store.basket }}</pre> -->
+
+    <div class="about" v-if="store.basket.length == 0">
+      <img src="@/assets/imgs/Add to Cart-amico 1.png" alt="">
+      <h4 class="text-center font-bold">Sizning savatchangiz bo'sh</h4>
     </div>
 
-    <div class="flex justify-center">
-
-      <div class=" border" @click="homePage"><el-icon size="30px" color="#6A984D">
-          <ArrowLeft />
-        </el-icon></div>
+    <div v-else class="basket relative">
 
 
-      <h1 class=" w-80 text-center text-2xl ">Savatcha</h1>
-    </div>
-
-  </div>
 
 
-  <div class="about" v-if="!is_basket">
-    <img src="@/assets/imgs/Add to Cart-amico 1.png" alt="">
-    <h4 class="text-center font-bold">Sizning savatchangiz bo'sh</h4>
-  </div>
-
-  <div v-else class="basket relative">
-
-   
-    
-
-    <div class="basketCount mt-8">
-      <div v-for="item in store.basket" :key="item.id" class="my-5">
-        <div class="flex justify-between my-2">
+      <div class="basketCount mt-8">
+        <div v-for="item in store.basket" :key="item.id" class="my-5">
+          <div class="my-2">
 
 
-          <div class="flex ">
-            <div class="pr-5  flex justify-center items-center">
-              <el-icon size="20px" color="#6A984D">
-                <CloseBold />
-              </el-icon>
+            <div class="flex  ">
+
+
+
+
+              <img :src="item.variants[0].images[0].image" alt="" class="w-[60px] h-[60px] " v-if="item.variants[0].images[0].image">
+              <img src="@/assets/imgs/noImg.png" alt="" v-else class="w-[60px] h-[60px]">
+
+
+
+              <div class="ml-4  w-full">
+                <p>{{ item.name }} {{ item.variants[0].weight }} {{ item.variants[0].criterion }}</p>
+
+                <div class="flex justify-between items-center">
+                  <div>
+                    <p> {{ item.variants[0].price }} so'm</p>
+                  </div>
+
+
+                  <div>
+
+                    <button class="btn w-[40px]" @click="store.basket.splice(store.basket.indexOf(item), 1)"
+                      v-if="item.variants[0].count === 1"><el-icon color="#EF4444">
+                        <!-- <Delete /> -->
+                        <CloseBold />
+                      </el-icon></button>
+
+                    <button class="btn w-[40px]" @click="item.variants[0].count--" v-else><el-icon color="#fff"
+                        :disabled="item.variants[0].count == 1">
+                        <Minus />
+                      </el-icon></button> <span class="mx-1">{{ item.variants[0].count }} </span>
+                    <button class="btn ml-1 w-[40px]" @click="item.variants[0].count++"
+                      :disabled="item.variants[0].count == item.variants[0].product_warehouse_total"><el-icon
+                        color="#fff">
+                        <Plus />
+                      </el-icon></button>
+                  </div>
+                </div>
+              </div>
+
+
+
             </div>
 
-            <img :src="item.img" alt="" class="w-[50px] h-[50px]">
-            <div class="ml-4">
-              <p>{{ item.name }} {{ item.criterionNumber }} {{ item.criterion }}</p>
-              <p> {{ item.price }} so'm</p>
-            </div>
+
+
+          </div>
+          <hr />
+
+
+        </div>
+
+
+        <div class="flex justify-between mt-20 mb-5">
+
+
+          <input placeholder="Promo code" class="w-[50%]" v-model="code" />
+          <button class="w-[49%] btn" @click="sendPromoCode">Qo'llash</button>
+        </div>
+        <div>
+          <div class="flex justify-between mt-2">
+            <p>Yetgazib berish</p>
+            <p>0 sum</p>
           </div>
 
-
-          <div>
-            <div>
-              <button class="btn" @click="item.count--"><el-icon color="#fff" :disabled="item.count == 1">
-                  <Minus />
-                </el-icon></button> <span class="mx-1">{{ item.count }} </span>
-              <button class="btn ml-1" @click="item.count++" :disabled="item.count == 10"><el-icon color="#fff">
-                  <Plus />
-                </el-icon></button>
-            </div>
+          <!-- total sum  -->
+          <div class="flex justify-between mt-2 font-bold">
+            <p>Umumiy narx</p>
+            <p> {{ totalPrice() }} sum</p>
           </div>
         </div>
-        <hr />
 
 
-      </div>
-
-
-      <div class="flex justify-between mt-20 mb-5">
-
-
-        <el-input placeholder="Promo code" class="w-[50%]" />
-        <button class="w-[49%] btn">Qo'llash</button>
-      </div>
-      <div>
-        <div class="flex justify-between mt-2">
-          <p>Yetgazib berish</p>
-          <p>0 sum</p>
+        <div class=" mt-8 mb-14">
+          <small class=" text-red-500 text-[14px]" v-if="totalSum">🛒 Xaridingiz <b>150,000 </b> so'mdan ko'p bo'lishi
+            kerak. </small>
+          <button class="btn w-full mt-2  py-2" @click="sendOrder">Buyurtma berish</button>
         </div>
-        <div class="flex justify-between mt-2 font-bold">
-          <p>Umumiy narx</p>
-          <p>{{ summ }} sum</p>
-        </div>
+
+
+
+
+
+
+
       </div>
-
-
-      <div>
-        <button class="btn w-full mt-8  py-2" @click="sendOrder">Buyurtma berish</button>
-      </div>
-
-
-
-
-
-
-
     </div>
   </div>
-  </div>
-  
+
 
 </template>
 
