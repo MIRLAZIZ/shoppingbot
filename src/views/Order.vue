@@ -11,7 +11,7 @@
 
 
         </div>
-        
+
         <el-form label-position="top">
 
 
@@ -58,7 +58,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, toRefs, watch } from 'vue'
+import { onMounted, ref, toRefs, watch } from 'vue'
 import { useHomeStore } from '@/stores/home.js'
 import { useRouter } from 'vue-router'
 
@@ -71,7 +71,8 @@ const userData = ref({
     phone: '',
     peyment_type: null,
     comment: null,
-    orderData: store.orderData
+    orderData: store.orderData,
+    code_id: null
 
 })
 const phoneValidation = () => {
@@ -118,10 +119,11 @@ const sendData = () => {
     peymentValidation()
     if (!phoneRequired.value && !requiredPeymentType.value) {
         store.createOrder(userData.value)
-            .then((res) => {
-                console.log(res);
+            .then(() => {
                 store.basket = []
                 userData.value = {}
+                store.code = null
+
                 router.push('/success')
 
 
@@ -164,10 +166,14 @@ watch(peyment_type, (newValue) => {
 
     }
 })
+onMounted(() => {
+    if (store.code.data.length > 0) {
+        userData.value.code_id = store.code.data[0].id
+    }
+})
 
 
 
-const phoneNumberr = ref('');
 
 
 </script>

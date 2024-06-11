@@ -10,7 +10,8 @@ export const useHomeStore = defineStore('home', {
     categordata: [],
     productData: {},
     orderData: [],
-    products: []
+    products: [],
+    code: null
   }),
   actions: {
     async getCategory() {
@@ -33,6 +34,9 @@ export const useHomeStore = defineStore('home', {
     // promo code 
     async promoCode(data) {
       return await api.post('/promo/check', data)
+      .then(res => {
+        this.code = res.data
+      })
     }
     
 

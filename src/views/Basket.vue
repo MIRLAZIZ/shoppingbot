@@ -5,9 +5,10 @@ import { useRouter } from 'vue-router'
 const store = useHomeStore()
 const router = useRouter()
 
-const code = ref(null)
+const code = ref('')
 
 const totalSum = ref(false)
+const discount = ref(0)
 
 
 const sendOrder = () => {
@@ -24,14 +25,10 @@ const sendOrder = () => {
   }
 }
 
-const sendPromoCode =  () => {
-  store.promoCode(code.value)
-  .then(res => {
-    console.log(res);
-  })
+const sendPromoCode = () => {
+  store.promoCode({ code: code.value })
 }
 
-// totalPrice 
 
 const totalPrice = () => {
   return store.basket.reduce((a, b) => a + b.variants[0].price * b.variants[0].count, 0)
@@ -89,7 +86,8 @@ const homePage = () => {
 
 
 
-              <img :src="item.variants[0].images[0].image" alt="" class="w-[60px] h-[60px] " v-if="item.variants[0].images[0].image">
+              <img :src="item.variants[0].images[0].image" alt="" class="w-[60px] h-[60px] "
+                v-if="item.variants[0].images[0].image">
               <img src="@/assets/imgs/noImg.png" alt="" v-else class="w-[60px] h-[60px]">
 
 
@@ -136,12 +134,15 @@ const homePage = () => {
 
         </div>
 
+        <!-- {{ store.code.data[0].id }} -->
 
-        <div class="flex justify-between mt-20 mb-5">
+
+        <p class="mt-20 mb-4 text-[14px] text-[#6A984D]" v-if="store.code !=null">{{ store.code?.status ? store.code?.data[0]?.discount + '% ' + store.code.message : store.code.message }}</p>
+        <div class="flex justify-between  mb-5">
 
 
-          <input placeholder="Promo code" class="w-[50%]" v-model="code" />
-          <button class="w-[49%] btn" @click="sendPromoCode">Qo'llash</button>
+          <el-input placeholder="Promo code" class="w-[50%]" v-model="code" />
+          <button class="w-[49%] btn" @click="sendPromoCode" :disabled="code.length < 4">Qo'llash</button>
         </div>
         <div>
           <div class="flex justify-between mt-2">
@@ -152,7 +153,8 @@ const homePage = () => {
           <!-- total sum  -->
           <div class="flex justify-between mt-2 font-bold">
             <p>Umumiy narx</p>
-            <p> {{ totalPrice() }} sum</p>
+            <p> {{ !store.code?.status ? totalPrice() : totalPrice() - (totalPrice() * (store.code?.data[0]?.discount /
+              100)) }} sum</p>
           </div>
         </div>
 

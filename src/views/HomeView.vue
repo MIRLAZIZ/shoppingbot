@@ -66,6 +66,8 @@ watch(search, (newValue) => {
 
     if (filteredProducts.length > 0) {
       categorizeProducts(filteredProducts);
+      searchNot.value = false;
+
     } else {
       categorizeProducts([]);
       searchNot.value = true;
@@ -246,7 +248,7 @@ const subtractionProductCount = (item) => {
         class="opacity-1 transition-all duration-[.5s]" :class="{ productSizewidthContent: prodductType }" />
     </div>
 
-    <div class="h-auto  py-3">
+    <div class="h-auto   py-3">
       <div class="flex items-center">
         <img src="@/assets/imgs/logo.png" alt="" class=" h-[80px] ">
         <h1 class="text-center text-2xl font-bold text-[#6A984D]">Bozorligim</h1>
@@ -296,7 +298,7 @@ const subtractionProductCount = (item) => {
 
 
     <!-- products data  -->
-    <div class="  overflow-y-scroll  productsData h-[60vh]  pb-16 relative " @scroll="handleProductDataScroll">
+    <div class="  overflow-y-scroll  productsData   pb-16 relative " @scroll="handleProductDataScroll">
       <button class="fixed bottom-6 right-6 bg-[#6A984D] w-12 h-12 rounded-full " @click="$router.push('/basket')"> <img
           src="@/assets/imgs/karzinka2.png" alt="">
         <small
@@ -477,6 +479,10 @@ const subtractionProductCount = (item) => {
 
 .productsData::-webkit-scrollbar {
   display: none;
+}
+
+.productsData {
+  height: calc(100vh - 290px);
 }
 
 .productImg {

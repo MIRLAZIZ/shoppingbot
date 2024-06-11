@@ -15,7 +15,7 @@
 
         </div>
         <div class="w-full h-[35vh] flex flex-col justify-center items-center">
-            <h3 class=" text-center ">Buyurtmangiz muvaffaqiyat bilan qabul qilindi! Siz bilan operatorimiz tez orada aloqaga chiqadi</h3>
+            <h3 class=" text-center ">Buyurtmangiz muvaffaqiyat bilan qabul qilindi! Siz bilan operatorlarimiz tez orada aloqaga chiqadi</h3>
 
             <button class="btn mt-16" @click="$router.push('/')">Bosh sahifa</button>
 
