@@ -133,11 +133,11 @@ const homePage = () => {
 
 
         </div>
+        <br>
 
-        <!-- {{ store.code.data[0].id }} -->
 
 
-        <p class="mt-20 mb-4 text-[14px] text-[#6A984D]" v-if="store.code !=null">{{ store.code?.status ? store.code?.data[0]?.discount + '% ' + store.code.message : store.code.message }}</p>
+        <p class=" mb-4 text-[14px] text-[#6A984D]" v-if="store.code !=null">{{ store.code?.status ? store.code?.data[0]?.discount + '% ' + store.code.message : store.code.message }}</p>
         <div class="flex justify-between  mb-5">
 
 

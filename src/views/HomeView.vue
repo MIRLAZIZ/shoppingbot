@@ -169,6 +169,7 @@ const handleProductDataScroll = () => {
 };
 
 const selectProductType = ref()
+
 const prodductAddbasket = item => {
   if (item.variants.length > 1) {
     prodductType.value = false
@@ -178,7 +179,8 @@ const prodductAddbasket = item => {
 
   }
   else {
-    store.basket.push(item)
+    const newItem = JSON.parse(JSON.stringify(item));
+    store.basket.push(newItem)
 
   }
 }

@@ -2,7 +2,7 @@
     <div>
 
         <!-- logo -->
-        <div class=" bg-white w-full darkClass">
+        <div class=" w-full">
             <div class="flex items-center">
                 <img src="@/assets/imgs/logo.png" alt="" class=" h-[80px] ">
                 <h1 class="text-center text-2xl font-bold text-[#6A984D]">Bozorligim</h1>
@@ -16,14 +16,15 @@
 
 
             <!-- first name -->
-            <el-form-item label="Ismi familiya">
+            <el-form-item label="Ismi familiya" required :error="requiredFullname">
                 <el-input v-model="userData.fullname" type="text" />
+                <small v-if="errorData && errorData.fullname" class="text-red-500">{{ errorData.fullname[0] }}</small>
             </el-form-item>
 
             <!-- phone -->
             <el-form-item label="Telefon raqami" required :error="phoneRequired">
                 <el-input v-model="userData.phone" type="text" :formatter="formatPhoneNumber" maxlength="17" />
-
+                <small v-if="errorData && errorData.phone" class="text-red-500">{{ errorData.phone[0] }}</small>
             </el-form-item>
 
 
@@ -34,6 +35,7 @@
                     <el-option label="Karta" value="card" />
                     <el-option label="Naqd" value="cash" />
                 </el-select>
+                <small v-if="errorData && errorData.peyment_type" class="text-red-500">{{ errorData.peyment_type[0] }}</small>
             </el-form-item>
 
 
@@ -45,7 +47,7 @@
 
 
         </el-form>
-
+          <div ><p class="text-red-500 text-end text-[13px]">{{ errorMessage }}</p></div>
         <div class="flex justify-end">
             <button @click="resetForm" class="btn bg-red-500 py-1">Orqaga</button>
             <button @click="sendData" class="btn ml-3 py-1">Ma'lumotlarni yuborish</button>
@@ -66,6 +68,7 @@ import { useRouter } from 'vue-router'
 const store = useHomeStore()
 const phoneRequired = ref(null)
 const requiredPeymentType = ref(null)
+const requiredFullname = ref(null)
 const userData = ref({
     fullname: null,
     phone: '',
@@ -75,6 +78,12 @@ const userData = ref({
     code_id: null
 
 })
+const errorData = ref({
+
+    fullname: null
+
+})
+const errorMessage = ref(null)
 const phoneValidation = () => {
     userData.value.phone ? phoneRequired.value = null : phoneRequired.value = 'Telefon raqam kiriting'
 }
@@ -82,6 +91,9 @@ const phoneValidation = () => {
 const peymentValidation = () => {
     userData.value.peyment_type ? requiredPeymentType.value = null : requiredPeymentType.value = 'To\'lov turi tanlang'
 
+}
+const requiredFullnameFunction = () => {
+    userData.value.fullname ? requiredFullname.value = null : requiredFullname.value = 'Ismingizni kiriting'
 }
 
 
@@ -117,9 +129,10 @@ const router = useRouter()
 const sendData = () => {
     phoneValidation()
     peymentValidation()
-    if (!phoneRequired.value && !requiredPeymentType.value) {
+    requiredFullnameFunction()
+    if (!phoneRequired.value && !requiredPeymentType.value && !requiredFullname.value) {
         store.createOrder(userData.value)
-            .then(() => {
+            .then(res => {
                 store.basket = []
                 userData.value = {}
                 store.code = null
@@ -128,6 +141,13 @@ const sendData = () => {
 
 
             })
+            .catch(err => {
+               errorMessage.value = err.response.data.message
+               errorData.value = err.response.data.errors
+                
+                console.log(err)
+            })
+            
 
 
 
@@ -146,6 +166,14 @@ const resetForm = () => {
 
 }
 const { fullname, phone, peyment_type, comment } = toRefs(userData.value)
+watch(fullname, (newValue) => {
+    if (newValue) {
+        requiredFullname.value = null
+    }
+    else {
+        requiredFullname.value = 'Ismingizni kiriting'
+    }
+})
 
 
 watch(phone, (newValue) => {
@@ -167,12 +195,16 @@ watch(peyment_type, (newValue) => {
     }
 })
 onMounted(() => {
-    if (store.code.data.length > 0) {
+    if (store.code && store.code.data && store.code.data.length > 0) {
         userData.value.code_id = store.code.data[0].id
     }
+
 })
 
 
+if (store.orderData.length == 0) { 
+    router.push('/')
+}
 
 
 
