@@ -5,6 +5,8 @@ import { onMounted, ref, computed, watch } from 'vue';
 import ProductSize from '@/views/ProductSize.vue'
 import { useHomeStore } from '@/stores/home.js'
 import { Search, Close } from '@element-plus/icons-vue'
+import Fuse from 'fuse.js';
+
 const store = useHomeStore()
 
 
@@ -15,7 +17,7 @@ const search = ref('')
 const searchNot = ref(false)
 
 const elementFind = (id) => {
-  return store.basket.find(el => el.variants[0].id === id)
+  return store.basket.find(el => el?.variants[0]?.id === id)
 }
 
 const categorValidate = (id) => {
@@ -26,51 +28,112 @@ const categorValidate = (id) => {
 
 
 
-// Lotin va kirill alifbolari orasida transliteratsiya qilish uchun yordamchi funksiya
+
+
+
+
+
 function transliterate(text, toCyrillic = false) {
   const cyrillicToLatin = {
-    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo', 'ж': 'j', 'з': 'z',
+    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'ye', 'ё': 'yo', 'ж': 'j', 'з': 'z',
     'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r',
-    'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'x', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'shch',
-    'ъ': '', 'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya',
-    'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ё': 'Yo', 'Ж': 'J', 'З': 'Z',
+    'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'kh', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sh',
+    'э': 'e', 'ю': 'yu', 'я': 'ya',
+    'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'Ye', 'Ё': 'Yo', 'Ж': 'J', 'З': 'Z',
     'И': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N', 'О': 'O', 'П': 'P', 'Р': 'R',
-    'С': 'S', 'Т': 'T', 'У': 'U', 'Ф': 'F', 'Х': 'X', 'Ц': 'Ts', 'Ч': 'Ch', 'Ш': 'Sh', 'Щ': 'Shch',
-    'Ъ': '', 'Ы': 'Y', 'Ь': '', 'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya'
+    'С': 'S', 'Т': 'T', 'У': 'U', 'Ф': 'F', 'Х': 'Kh', 'Ц': 'Ts', 'Ч': 'Ch', 'Ш': 'Sh', 'Щ': 'Sh',
+    'Э': 'E', 'Ю': 'Yu', 'Я': 'Ya'
   };
 
-  const latinToCyrillic = {};
-  for (let key in cyrillicToLatin) {
-    latinToCyrillic[cyrillicToLatin[key]] = key;
-  }
+  const latinToCyrillic = {
+    'a': 'а', 'b': 'б', 'v': 'в', 'g': 'г', 'd': 'д', 'yo': 'ё', 'j': 'ж', 'z': 'з',
+    'i': 'и', 'y': 'й', 'k': 'к', 'l': 'л', 'm': 'м', 'n': 'н', 'o': 'о', 'p': 'п', 'r': 'р',
+    's': 'с', 't': 'т', 'u': 'у', 'f': 'ф', 'kh': 'х', 'ts': 'ц', 'ch': 'ч', 'sh': 'ш',
+    'e': 'э', 'yu': 'ю', 'ya': 'я', 'ye': 'е', 'h': 'х',
+    'A': 'А', 'B': 'Б', 'V': 'В', 'G': 'Г', 'D': 'Д', 'Yo': 'Ё', 'J': 'Ж', 'Z': 'З',
+    'I': 'И', 'Y': 'Й', 'K': 'К', 'L': 'Л', 'M': 'М', 'N': 'Н', 'O': 'О', 'P': 'П', 'R': 'Р',
+    'S': 'С', 'T': 'Т', 'U': 'У', 'F': 'Ф', 'Kh': 'Х', 'Ts': 'Ц', 'Ch': 'Ч', 'Sh': 'Ш',
+    'E': 'Э', 'Yu': 'Ю', 'Ya': 'Я', 'H': 'Х', 'h': 'х', 'Ye': 'Е',
+  };
 
   const transliterationMap = toCyrillic ? latinToCyrillic : cyrillicToLatin;
 
-  return text.split('').map(char => transliterationMap[char] || char).join('');
+  return text.split('').map((char, index, array) => {
+    let nextChar = array[index + 1];
+    let combinedChar = char + nextChar;
+
+    if (transliterationMap[combinedChar]) {
+      array[index + 1] = '';  // Skip the next character
+      return transliterationMap[combinedChar];
+    } else if (transliterationMap[char]) {
+      return transliterationMap[char];
+    } else {
+      return char;
+    }
+  }).join('');
+}
+
+
+
+
+
+// Function to initialize Fuse.js
+function createFuseSearch(data, keys) {
+  return new Fuse(data, {
+    keys: keys,
+    threshold: 0.1,  // Adjust threshold for fuzziness (lower is more strict, higher is more lenient)
+    includeScore: true
+  });
 }
 
 watch(search, (newValue) => {
-  if (newValue.length > 2) {
-    let filteredProducts = store.products.filter(product => {
-      if (!product.name) return false;
+  if (newValue.length > 1) {
+    const searchValueLower = newValue.toLowerCase();
+    const transliteratedSearchValueToLatin = transliterate(searchValueLower, false);
+    const transliteratedSearchValueToCyrillic = transliterate(searchValueLower, true);
 
-      const productNameLower = product.name.toLowerCase();
-      const searchValueLower = newValue.toLowerCase();
-      const transliteratedSearchValueToLatin = transliterate(searchValueLower, false);
-      const transliteratedSearchValueToCyrillic = transliterate(searchValueLower, true);
+    // Create Fuse.js instances for categories and products
+    let fuseCategory = createFuseSearch(store.categordata, ['name']);
+    let fuseProduct = createFuseSearch(store.products, ['name']);
 
-      return productNameLower.includes(searchValueLower) ||
-        productNameLower.includes(transliteratedSearchValueToLatin) ||
-        productNameLower.includes(transliteratedSearchValueToCyrillic);
-    });
+    // Search categories
+    let categoryResults = fuseCategory.search(searchValueLower)
+      .concat(fuseCategory.search(transliteratedSearchValueToLatin))
+      .concat(fuseCategory.search(transliteratedSearchValueToCyrillic))
+      .map(result => result.item);
 
-    if (filteredProducts.length > 0) {
-      categorizeProducts(filteredProducts);
+    // Ensure unique results by using a Set
+    categoryResults = Array.from(new Set(categoryResults.map(item => item.id)))
+      .map(id => categoryResults.find(item => item.id === id));
+
+    if (categoryResults.length > 0) {
+      categoryActive(categoryResults[0].id);
       searchNot.value = false;
-
+      categorizeProducts(store.products);
+      // Check if the hash is already set to avoid redundant updates
+      if (window.location.hash !== `#${categoryResults[0].id}`) {
+        window.location.hash = `#${categoryResults[0].id}`;
+      }
     } else {
-      categorizeProducts([]);
-      searchNot.value = true;
+      // Search products if no categories are found
+      let productResults = fuseProduct.search(searchValueLower)
+        .concat(fuseProduct.search(transliteratedSearchValueToLatin))
+        .concat(fuseProduct.search(transliteratedSearchValueToCyrillic))
+        .map(result => result.item);
+
+      // Ensure unique results by using a Set
+      productResults = Array.from(new Set(productResults.map(item => item.id)))
+        .map(id => productResults.find(item => item.id === id));
+
+      if (productResults.length > 0) {
+        categorizeProducts(productResults);
+        categoryActive(productResults[0].category_id);
+        window.location.hash = `#${productResults[0].category_id}`;
+        searchNot.value = false;
+      } else {
+        categorizeProducts([]);
+        searchNot.value = true;
+      }
     }
   } else {
     categorizeProducts(store.products);
@@ -79,14 +142,11 @@ watch(search, (newValue) => {
 });
 
 
-
-
-
-
 const prodductType = ref(true)
 
 const categoryActive = (id) => {
   acteveCategory.value = id
+
 
 
 
@@ -134,6 +194,10 @@ const updateActiveCategoryOnScroll = () => {
     acteveCategory.value = currentActiveId;
   }
 };
+
+
+
+
 
 onMounted(() => {
   if (store.categordata.length == 0) {
@@ -257,15 +321,15 @@ const subtractionProductCount = (item) => {
 
 
       </div>
-      <el-input v-model="search"  placeholder="Maxsulotlarni qidirish" :prefix-icon="Search"
-        class="mb-3 h-[40px]"> <template #append  class="cursor-pointer ">
+      <el-input v-model="search" placeholder="Maxsulotlarni qidirish" :prefix-icon="Search" class="mb-3 h-[40px]">
+        <template #append class="cursor-pointer ">
 
-          <el-button :icon="Close"  @click="search = ''"/>
-          
-        
-          
-          
-        
+          <el-button :icon="Close" @click="search = ''" />
+
+
+
+
+
         </template></el-input>
 
 
@@ -311,7 +375,7 @@ const subtractionProductCount = (item) => {
       <p v-if="searchNot" class="text-center font-bold text-[#6A984D] text-1xl">Siz qidirgan mahsulot hozirda bizning
         bazamizda mavjud emas</p>
 
-      <div v-for="category in store.category" :key="category.id" :id="category.id" class="productCategory">
+      <div v-for="(category, idx) in store.category" :key="idx" :id="category.id" class="productCategory">
 
 
         <h1 class="font-bold text-[#6A984D] text-1xl" v-if="categorValidate(category.id)">{{ category.name }}</h1>
@@ -325,7 +389,7 @@ const subtractionProductCount = (item) => {
             <div class="  " style="width: 25% !important;">
 
               <img :src="item?.variants[0]?.images[0]?.image" alt="" class="productImg"
-                v-if="item?.variants[0]?.images">
+                v-if="item.variants[0]?.images[0]?.image">
 
 
               <img src="@/assets/imgs/noImg.png" alt="" v-else class="productImg">
@@ -334,10 +398,12 @@ const subtractionProductCount = (item) => {
             </div>
             <!-- product name  -->
             <div style="width: 75%;">
-              <p class="mb-2 ml-2 font-bold text-[14px]">{{ item.name }}</p>
+              <p class="mb-2 ml-2 font-bold text-[14px]">{{ item.name }} {{ item.weight }} {{ item.type1 }}</p>
               <p class="mb-2 ml-2">{{ item.subtitre }} </p>
               <div class="flex items-center justify-between ml-2">
-                <p class="font-bold">{{ item?.variants[0]?.price }} so'm</p>
+                <p class="font-bold"> {{store.formatPrice(item.variants[0].price)}} so'm</p>
+
+              
 
               </div>
 
@@ -369,7 +435,7 @@ const subtractionProductCount = (item) => {
                   <span class="mx-2">{{ store.basket.find(element => element.id == item.id).variants[0].count }}
                   </span>
                   <button class="btn" @click="addProductCount(item)"
-                    :disabled="elementFind(item.variants[0].id).variants[0].count == item.variants[0].product_warehouse_total"><el-icon
+                    :disabled="item.variants.length == 1 && elementFind(item.variants[0].id).variants[0]?.count == item.variants[0].product_warehouse_total"><el-icon
                       color="#fff">
                       <Plus />
                     </el-icon></button>

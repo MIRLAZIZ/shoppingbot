@@ -4,24 +4,30 @@
 body {
   font-family: 'Open Sans', sans-serif;
   transition: all .5s ease;
+  /* touch-action: none !important; */
+
 
   /* overflow-y: hidden; */
 }
+
 .btn {
   background: #6A984D;
   color: #fff;
-  min-width:40px;
+  min-width: 40px;
   min-height: 30px;
-  padding: 5px  10px;
+  padding: 5px 10px;
   border-radius: 5px;
   font-size: 14px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shaddov qo'shish */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* Shaddov qo'shish */
 }
+
 .dark .darkClass {
-  background-color: #121212; 
+  background-color: #121212;
 }
+
 .btn:disabled {
   opacity: 0.7;
   cursor: not-allowed;

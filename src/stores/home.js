@@ -17,14 +17,14 @@ export const useHomeStore = defineStore('home', {
     async getCategory() {
       return await api.get('/categories').then((res) => {
         this.category = res.data.data
-        this.categordata =res.data.data
+        this.categordata = res.data.data
       })
     },
     async getProducts() {
       return await api.get('/products')
-      .then(res => {
-        this.products = res.data.data
-      })
+        .then(res => {
+          this.products = res.data.data
+        })
     },
     //  order/create/
 
@@ -34,11 +34,15 @@ export const useHomeStore = defineStore('home', {
     // promo code 
     async promoCode(data) {
       return await api.post('/promo/check', data)
-      .then(res => {
-        this.code = res.data
-      })
+        .then(res => {
+          this.code = res.data
+        })
+    },
+
+    formatPrice(number) {
+      return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
     }
-    
+
 
   },
 })

@@ -3,8 +3,8 @@
     <header>
 
       <div class="mainContainer">
-       
-          <RouterView />
+
+        <RouterView />
 
       </div>
     </header>
@@ -18,16 +18,12 @@ import { onMounted } from 'vue';
 
 
 onMounted(() => {
-  // console.log(window.Telegram.WebApp.themeParams)
   const html = document.getElementsByTagName('html')
   if (window.Telegram.WebApp.colorScheme == 'light') {
     html[0].classList.remove('dark')
   } else {
     html[0].classList.add('dark')
   }
-
-
- 
 })
 
 

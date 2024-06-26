@@ -18,13 +18,13 @@
 
 
 
-
     <!-- product img  -->
     <div class="flex items-center justify-center  rounded"
       v-if="props.selectProductType && props.selectProductType.variants">
-      <img :src="props.selectProductType.variants[variantIndex].images[0].image" alt="" class="w-[150px]" v-if="props.selectProductType.variants[variantIndex].images[0]?.image" />
+      <img :src="props.selectProductType.variants[variantIndex].images[0].image" alt="" class="w-[150px] h-[150px]"
+        v-if="props.selectProductType.variants[variantIndex].images[0]?.image" />
 
-      <img src="@/assets/imgs/noImg.png" alt="" v-else class="productImg">
+      <img src="@/assets/imgs/noImg.png" alt="" v-else class="w-[150px] h-[150px]">
 
 
     </div>
@@ -41,17 +41,19 @@
         @click="variantIndex = idx">
 
         <input type="radio" :id="idx" v-model="radio" :value="item.weight" :checked="idx === variantIndex">
-        <label :for="idx" class="m-1  text-[14px]  w-full">{{ item.weight }} <span class="ml-[2px]">{{
-          item.criterion
-            }}</span></label><br>
+        <label :for="idx" class="m-1  text-[14px]  w-full">{{ item.weight }} <span class="ml-[2px]">
+            {{
+              props.selectProductType.type1
+            }}
+          </span></label><br>
 
       </div>
 
       <!-- price and total price  -->
     </div>
-    <p class="mt-3 mb-1">Narxi: {{ props.selectProductType.variants[variantIndex].price }}</p>
+    <p class="mt-3 mb-1">Narxi: {{ store.formatPrice(props.selectProductType.variants[variantIndex].price) }}</p>
     <p>Jami:
-      {{ totalPrice }}
+      {{ store.formatPrice(totalPrice) }}
     </p>
 
     <div class="mt-3 flex   justify-between">
@@ -126,11 +128,15 @@ const totalPrice = computed(() => {
 const send = () => {
 
 
+
   let data = {
     id: props.selectProductType.id,
     name: props.selectProductType.name,
+    type1: props.selectProductType.type1,
+    weight: props.selectProductType.variants[variantIndex.value].weight,
     variants: [props.selectProductType.variants[variantIndex.value]]
   }
+  console.log(data);
   store.basket.push(data)
   emit('hide')
 }
@@ -155,54 +161,6 @@ const addCount = () => {
 }
 
 
-// const minusCount = () => {
-//   // props.selectProductType.variants[variantIndex.value] orqali variantni topamiz
-
-//   const variantId = props.selectProductType.variants[variantIndex.value].id;
-
-//   // store.basket ichidan kerakli elementni topamiz
-//   let element = store.basket.find(el => el.variants[0].id === variantId);
-
-//   let parentElement = store.basket.some(el => el.id === props.selectProductType.id)
-
-
-
-//   // element mavjudligini tekshiramiz
-//   if (parentElement) {
-//     // Agar elementning count 1 bo'lsa, uni store.basket dan olib tashlaymiz
-//     if (element && element.variants[0].count === 1) {
-//       store.basket = store.basket.filter(basketItem => basketItem.variants[0].id !== variantId);
-
-
-
-//     } else {
-//       // Aks holda, count ni kamaytiramiz
-//       if (element) {
-//         element.variants[0].count--;
-//         if (element.variants[0].count < element.variants[0].product_warehouse_total - 90) {
-//           totalproduct.value = false
-
-//         }
-
-//       }
-
-//     }
-//   } else {
-//     // Agar element topilmasa, props.selectProductType.variants[variantIndex.value] ni kamaytiramiz
-//     if (props.selectProductType.variants[variantIndex.value].count > 1) {
-//       props.selectProductType.variants[variantIndex.value].count--;
-//       if (props.selectProductType.variants[variantIndex.value].count < props.selectProductType.variants[variantIndex.value].product_warehouse_total - 90) {
-//         totalproduct.value = false
-
-//       }
-
-//     } else {
-//       props.selectProductType.variants[variantIndex.value].count = 1
-
-
-//     }
-//   }
-// };
 
 
 
@@ -219,12 +177,12 @@ const minusCount = () => {
   if (parentElementExists) {
     if (basketElement) {
       const basketVariant = basketElement.variants[0];
-      
+
       if (basketVariant.count === 1) {
         store.basket = store.basket.filter(basketItem => basketItem.variants[0].id !== variantId);
       } else {
         basketVariant.count--;
-        if (basketVariant.count < basketVariant.product_warehouse_total ) {
+        if (basketVariant.count < basketVariant.product_warehouse_total) {
           totalproduct.value = false;
         }
       }

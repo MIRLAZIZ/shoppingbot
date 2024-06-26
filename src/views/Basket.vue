@@ -75,7 +75,6 @@ const homePage = () => {
 
 
 
-
       <div class="basketCount mt-8">
         <div v-for="item in store.basket" :key="item.id" class="my-5">
           <div class="my-2">
@@ -93,11 +92,11 @@ const homePage = () => {
 
 
               <div class="ml-4  w-full">
-                <p>{{ item.name }} {{ item.variants[0].weight }} {{ item.variants[0].criterion }}</p>
+                <p>{{ item.name }} {{ item.weight }} {{ item.type1 }}</p>
 
                 <div class="flex justify-between items-center">
                   <div>
-                    <p> {{ item.variants[0].price }} so'm</p>
+                    <p> {{ store.formatPrice(item.variants[0].price) }} so'm</p>
                   </div>
 
 
@@ -137,7 +136,8 @@ const homePage = () => {
 
 
 
-        <p class=" mb-4 text-[14px] text-[#6A984D]" v-if="store.code !=null">{{ store.code?.status ? store.code?.data[0]?.discount + '% ' + store.code.message : store.code.message }}</p>
+        <p class=" mb-4 text-[14px] text-[#6A984D]" v-if="store.code != null">{{ store.code?.status ?
+          store.code?.data[0]?.discount + '% ' + store.code.message : store.code.message }}</p>
         <div class="flex justify-between  mb-5">
 
 
@@ -153,14 +153,15 @@ const homePage = () => {
           <!-- total sum  -->
           <div class="flex justify-between mt-2 font-bold">
             <p>Umumiy narx</p>
-            <p> {{ !store.code?.status ? totalPrice() : totalPrice() - (totalPrice() * (store.code?.data[0]?.discount /
-              100)) }} sum</p>
+            <p> {{ store.formatPrice(!store.code?.status ? totalPrice() : totalPrice() - (totalPrice() *
+              (store.code?.data[0]?.discount /
+              100)) )}} sum</p>
           </div>
         </div>
 
 
         <div class=" mt-8 mb-14">
-          <small class=" text-red-500 text-[14px]" v-if="totalSum">🛒 Xaridingiz <b>150,000 </b> so'mdan ko'p bo'lishi
+          <small class=" text-red-500 text-[14px]" v-if="totalSum">🛒 Xaridingiz <b>150 000 </b> so'mdan ko'p bo'lishi
             kerak. </small>
           <button class="btn w-full mt-2  py-2" @click="sendOrder">Buyurtma berish</button>
         </div>
