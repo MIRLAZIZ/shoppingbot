@@ -15,6 +15,7 @@ const acteveCategory = ref(1)
 const loading = ref(false)
 const search = ref('')
 const searchNot = ref(false)
+const searchInput = ref(null);
 
 const elementFind = (id) => {
   return store.basket.find(el => el?.variants[0]?.id === id)
@@ -81,7 +82,7 @@ function transliterate(text, toCyrillic = false) {
 function createFuseSearch(data, keys) {
   return new Fuse(data, {
     keys: keys,
-    threshold: 0.1,  // Adjust threshold for fuzziness (lower is more strict, higher is more lenient)
+    threshold: 0.2,  // Adjust threshold for fuzziness (lower is more strict, higher is more lenient)
     includeScore: true
   });
 }
@@ -111,9 +112,10 @@ watch(search, (newValue) => {
       searchNot.value = false;
       categorizeProducts(store.products);
       // Check if the hash is already set to avoid redundant updates
-      if (window.location.hash !== `#${categoryResults[0].id}`) {
+      // if (window.location.hash !== `#${categoryResults[0].id}`) {
+        categoryActive(categoryResults[0].id);
         window.location.hash = `#${categoryResults[0].id}`;
-      }
+      // }
     } else {
       // Search products if no categories are found
       let productResults = fuseProduct.search(searchValueLower)
@@ -219,7 +221,8 @@ onMounted(() => {
 
 });
 
-const handleProductDataScroll = () => {
+const handleProductDataScroll = (e) => {
+  e.stopImmediatePropagation()
   updateActiveCategoryOnScroll();
   // Scroll transition
   const categoryElement = document.querySelector('.category');
@@ -287,24 +290,29 @@ const subtractionProductCount = (item) => {
 
 
 
+const handleBlur = (event) => {
+  event.preventDefault();
+  setTimeout(() => {
+    if (searchInput.value) {
+      searchInput.value.$el.querySelector('input').focus();
+    }
+  }, 0);
+};
+
+
+
+
+
+
 </script>
 
 <template>
+ 
+
 
 
   <div class="text-center h-[100vh]  flex items-center justify-center" v-if="loading">
-    <div role="status">
-      <svg aria-hidden="true" class="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600"
-        viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path
-          d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-          fill="currentColor" />
-        <path
-          d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-          fill="#6A984D" />
-      </svg>
-      <span class="sr-only">Loading...</span>
-    </div>
+    <div class="loader"></div>
   </div>
 
   <div class="relative" v-else>
@@ -321,7 +329,10 @@ const subtractionProductCount = (item) => {
 
 
       </div>
-      <el-input v-model="search" placeholder="Maxsulotlarni qidirish" :prefix-icon="Search" class="mb-3 h-[40px]">
+
+      
+      <el-input v-model="search" placeholder="Maxsulotlarni qidirish" :prefix-icon="Search" class="mb-3 h-[40px]" @blur="handleBlur($event)" 
+      ref="searchInput"> 
         <template #append class="cursor-pointer ">
 
           <el-button :icon="Close" @click="search = ''" />
@@ -331,6 +342,7 @@ const subtractionProductCount = (item) => {
 
 
         </template></el-input>
+      
 
 
       <!-- category -->
@@ -364,7 +376,7 @@ const subtractionProductCount = (item) => {
 
 
     <!-- products data  -->
-    <div class="  overflow-y-scroll  productsData   pb-16 relative " @scroll="handleProductDataScroll">
+    <div class="  overflow-y-scroll  productsData   pb-16 relative " @scroll="handleProductDataScroll($event)">
       <button class="fixed bottom-6 right-6 bg-[#6A984D] w-12 h-12 rounded-full " @click="$router.push('/basket')"> <img
           src="@/assets/imgs/karzinka2.png" alt="">
         <small
@@ -565,4 +577,60 @@ const subtractionProductCount = (item) => {
 .productSizewidthContent {
   opacity: 0;
 }
+
+
+.loader {
+  width: 100px;
+  height: 50px;
+  border-radius: 0 0 100px 100px;
+  border: 5px solid #538a2d;
+  border-top: 0;
+  box-sizing: border-box;
+  background:
+    radial-gradient(farthest-side at top,#0000 calc(100% - 5px),#e7ef9d calc(100% - 4px)), 
+    radial-gradient(2px 3px,#5c4037 89%,#0000) 0 0/17px 12px,
+    #ff1643;
+  --c:radial-gradient(farthest-side,#000 94%,#0000);
+  -webkit-mask:
+    linear-gradient(#0000 0 0),
+    var(--c) 12px -8px,
+    var(--c) 29px -8px,
+    var(--c) 45px -6px,
+    var(--c) 22px -2px,
+    var(--c) 34px  6px, 
+    var(--c) 21px  6px,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0),
+    var(--c) 12px -8px,
+    var(--c) 29px -8px,
+    var(--c) 45px -6px,
+    var(--c) 22px -2px,
+    var(--c) 34px  6px, 
+    var(--c) 21px  6px,
+    linear-gradient(#0000 0 0);
+  -webkit-mask-composite:destination-out;
+  mask-composite:exclude,add,add,add,add,add,add;
+  -webkit-mask-repeat: no-repeat;
+  animation: l8 3s infinite;
+}
+@keyframes l8 {
+ 0%   {-webkit-mask-size: auto,0 0,0 0,0 0,0 0,0 0,0 0}
+ 15%  {-webkit-mask-size: auto,20px 20px,0 0,0 0,0 0,0 0,0 0}
+ 30%  {-webkit-mask-size: auto,20px 20px,20px 20px,0 0,0 0,0 0,0 0}
+ 45%  {-webkit-mask-size: auto,20px 20px,20px 20px,20px 20px,0 0,0 0,0 0}
+ 60%  {-webkit-mask-size: auto,20px 20px,20px 20px,20px 20px,20px 20px,0 0,0 0}
+ 75%  {-webkit-mask-size: auto,20px 20px,20px 20px,20px 20px,20px 20px,20px 20px,0 0}
+ 90%,
+ 100% {-webkit-mask-size: auto,20px 20px,20px 20px,20px 20px,20px 20px,20px 20px,20px 20px}
+}
 </style>
+
+
+
+
+
+
+
+
+
