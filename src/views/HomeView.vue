@@ -1,11 +1,12 @@
 <script setup>
 
 import { ElIcon } from 'element-plus'
-import { onMounted, ref, computed, watch } from 'vue';
+import { onMounted, ref, computed, watch, nextTick } from 'vue';
 import ProductSize from '@/views/ProductSize.vue'
 import { useHomeStore } from '@/stores/home.js'
 import { Search, Close } from '@element-plus/icons-vue'
 import Fuse from 'fuse.js';
+import { useRouter } from 'vue-router'
 
 const store = useHomeStore()
 
@@ -13,7 +14,7 @@ const store = useHomeStore()
 
 const acteveCategory = ref(1)
 const loading = ref(false)
-const search = ref('')
+const search = ref(null)
 const searchNot = ref(false)
 const searchInput = ref(null);
 
@@ -86,8 +87,9 @@ function createFuseSearch(data, keys) {
     includeScore: true
   });
 }
+const router = useRouter()
 
-watch(search, (newValue) => {
+watch(search, async (newValue) => {
   if (newValue.length > 1) {
     const searchValueLower = newValue.toLowerCase();
     const transliteratedSearchValueToLatin = transliterate(searchValueLower, false);
@@ -110,12 +112,11 @@ watch(search, (newValue) => {
     if (categoryResults.length > 0) {
       categoryActive(categoryResults[0].id);
       searchNot.value = false;
-      categorizeProducts(store.products);
-      // Check if the hash is already set to avoid redundant updates
-      // if (window.location.hash !== `#${categoryResults[0].id}`) {
-        categoryActive(categoryResults[0].id);
-        window.location.hash = `#${categoryResults[0].id}`;
-      // }
+      await categorizeProducts(store.products);
+      await handleProductDataScroll();
+
+      categoryScroll(categoryResults[0].id);
+
     } else {
       // Search products if no categories are found
       let productResults = fuseProduct.search(searchValueLower)
@@ -123,14 +124,14 @@ watch(search, (newValue) => {
         .concat(fuseProduct.search(transliteratedSearchValueToCyrillic))
         .map(result => result.item);
 
-      // Ensure unique results by using a Set
       productResults = Array.from(new Set(productResults.map(item => item.id)))
         .map(id => productResults.find(item => item.id === id));
 
       if (productResults.length > 0) {
         categorizeProducts(productResults);
-        categoryActive(productResults[0].category_id);
-        window.location.hash = `#${productResults[0].category_id}`;
+        await categoryActive(productResults[0].category_id);
+        await handleProductDataScroll();
+
         searchNot.value = false;
       } else {
         categorizeProducts([]);
@@ -144,18 +145,13 @@ watch(search, (newValue) => {
 });
 
 
+
 const prodductType = ref(true)
 
 const categoryActive = (id) => {
   acteveCategory.value = id
 
 
-
-
-  const element = document.getElementById('category' + id);
-  if (element) {
-    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
 }
 const categorizeProducts = (products) => {
   const categorizedData = {};
@@ -181,14 +177,20 @@ const categorizeProducts = (products) => {
 
 const updateActiveCategoryOnScroll = () => {
   const elements = document.querySelectorAll('.productCategory');
+
+
   const offset = window.innerHeight / 2;
+
 
   let currentActiveId = null;
 
   elements.forEach(element => {
     const rect = element.getBoundingClientRect();
     if (rect.top >= 0 && rect.top < offset) {
+      // console.log(parseInt(element.getAttribute('id')));
+
       currentActiveId = parseInt(element.getAttribute('id'));
+
     }
   });
 
@@ -221,18 +223,67 @@ onMounted(() => {
 
 });
 
-const handleProductDataScroll = (e) => {
-  e.stopImmediatePropagation()
-  updateActiveCategoryOnScroll();
+
+
+const handleCategoryDataScroll = () => {
   // Scroll transition
   const categoryElement = document.querySelector('.category');
-  const activeCategoryElement = document.querySelector('.category .active');
+  const activeCategoryElement = document.getElementById('category' + acteveCategory.value);
+
   if (categoryElement && activeCategoryElement) {
+
+
     categoryElement.scroll({
       left: activeCategoryElement.offsetLeft - categoryElement.offsetLeft,
       behavior: 'smooth'
-    });
+    })
+
   }
+}
+
+
+
+
+
+
+// watch(acteveCategory, async (newValue) => {
+//   if (newValue) {
+//     router.push({ hash: '#' + newValue })
+//     await nextTick() // Wait for DOM updates to complete
+
+//     const container = document.getElementById('productsData')
+//     const element = document.getElementById(newValue)
+//     // if (element) {
+
+//     //     element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
+//     // }
+
+//     if (container && element) {
+//       container.scrollTop = element.offsetTop - container.offsetTop
+//     }
+//   }
+// })
+
+
+const categoryScroll = async (id) => {
+  if (id) {
+    router.push({ hash: '#' + id })
+    await nextTick() // Wait for DOM updates to complete
+
+    const container = document.getElementById('productsData')
+    const element = document.getElementById(id)
+
+    if (container && element) {
+      container.scrollTop = element.offsetTop - container.offsetTop + 300
+    }
+  }
+}
+
+const handleProductDataScroll = () => {
+  updateActiveCategoryOnScroll();
+  handleCategoryDataScroll();
+
 };
 
 const selectProductType = ref()
@@ -290,14 +341,7 @@ const subtractionProductCount = (item) => {
 
 
 
-const handleBlur = (event) => {
-  event.preventDefault();
-  setTimeout(() => {
-    if (searchInput.value) {
-      searchInput.value.$el.querySelector('input').focus();
-    }
-  }, 0);
-};
+
 
 
 
@@ -307,7 +351,7 @@ const handleBlur = (event) => {
 </script>
 
 <template>
- 
+
 
 
 
@@ -330,9 +374,8 @@ const handleBlur = (event) => {
 
       </div>
 
-      
-      <el-input v-model="search" placeholder="Maxsulotlarni qidirish" :prefix-icon="Search" class="mb-3 h-[40px]" @blur="handleBlur($event)" 
-      ref="searchInput"> 
+
+      <el-input v-model="search" placeholder="Maxsulotlarni qidirish" :prefix-icon="Search" class="mb-3 h-[40px]">
         <template #append class="cursor-pointer ">
 
           <el-button :icon="Close" @click="search = ''" />
@@ -342,12 +385,12 @@ const handleBlur = (event) => {
 
 
         </template></el-input>
-      
-
 
       <!-- category -->
-      <div class="flex overflow-x-auto category  " v-if="store.category.length">
 
+
+
+      <div class="flex overflow-x-auto category  " v-if="store.category.length">
 
         <a v-for="(item, idx) in store.category" :key="item.id" :class="{ 'active': acteveCategory == item.id }"
           :style="`margin-left:${idx === 0 ? '0px' : '10px'}; `" @click=categoryActive(item.id)
@@ -376,7 +419,8 @@ const handleBlur = (event) => {
 
 
     <!-- products data  -->
-    <div class="  overflow-y-scroll  productsData   pb-16 relative " @scroll="handleProductDataScroll($event)">
+    <div class="  overflow-y-scroll  productsData    pb-16 relative " @scroll="handleProductDataScroll($event)"
+      id="productsData">
       <button class="fixed bottom-6 right-6 bg-[#6A984D] w-12 h-12 rounded-full " @click="$router.push('/basket')"> <img
           src="@/assets/imgs/karzinka2.png" alt="">
         <small
@@ -390,7 +434,8 @@ const handleBlur = (event) => {
       <div v-for="(category, idx) in store.category" :key="idx" :id="category.id" class="productCategory">
 
 
-        <h1 class="font-bold text-[#6A984D] text-1xl" v-if="categorValidate(category.id)">{{ category.name }}</h1>
+        <h1 class="font-bold text-[#6A984D] text-1xl" v-if="categorValidate(category.id)">{{ category.name }}
+        </h1>
 
 
 
@@ -413,9 +458,9 @@ const handleBlur = (event) => {
               <p class="mb-2 ml-2 font-bold text-[14px]">{{ item.name }} {{ item.weight }} {{ item.type1 }}</p>
               <p class="mb-2 ml-2">{{ item.subtitre }} </p>
               <div class="flex items-center justify-between ml-2">
-                <p class="font-bold"> {{store.formatPrice(item.variants[0].price)}} so'm</p>
+                <p class="font-bold"> {{ store.formatPrice(item.variants[0].price) }} so'm</p>
 
-              
+
 
               </div>
 
@@ -587,18 +632,18 @@ const handleBlur = (event) => {
   border-top: 0;
   box-sizing: border-box;
   background:
-    radial-gradient(farthest-side at top,#0000 calc(100% - 5px),#e7ef9d calc(100% - 4px)), 
-    radial-gradient(2px 3px,#5c4037 89%,#0000) 0 0/17px 12px,
+    radial-gradient(farthest-side at top, #0000 calc(100% - 5px), #e7ef9d calc(100% - 4px)),
+    radial-gradient(2px 3px, #5c4037 89%, #0000) 0 0/17px 12px,
     #ff1643;
-  --c:radial-gradient(farthest-side,#000 94%,#0000);
+  --c: radial-gradient(farthest-side, #000 94%, #0000);
   -webkit-mask:
     linear-gradient(#0000 0 0),
     var(--c) 12px -8px,
     var(--c) 29px -8px,
     var(--c) 45px -6px,
     var(--c) 22px -2px,
-    var(--c) 34px  6px, 
-    var(--c) 21px  6px,
+    var(--c) 34px 6px,
+    var(--c) 21px 6px,
     linear-gradient(#000 0 0);
   mask:
     linear-gradient(#000 0 0),
@@ -606,31 +651,43 @@ const handleBlur = (event) => {
     var(--c) 29px -8px,
     var(--c) 45px -6px,
     var(--c) 22px -2px,
-    var(--c) 34px  6px, 
-    var(--c) 21px  6px,
+    var(--c) 34px 6px,
+    var(--c) 21px 6px,
     linear-gradient(#0000 0 0);
-  -webkit-mask-composite:destination-out;
-  mask-composite:exclude,add,add,add,add,add,add;
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude, add, add, add, add, add, add;
   -webkit-mask-repeat: no-repeat;
   animation: l8 3s infinite;
 }
+
 @keyframes l8 {
- 0%   {-webkit-mask-size: auto,0 0,0 0,0 0,0 0,0 0,0 0}
- 15%  {-webkit-mask-size: auto,20px 20px,0 0,0 0,0 0,0 0,0 0}
- 30%  {-webkit-mask-size: auto,20px 20px,20px 20px,0 0,0 0,0 0,0 0}
- 45%  {-webkit-mask-size: auto,20px 20px,20px 20px,20px 20px,0 0,0 0,0 0}
- 60%  {-webkit-mask-size: auto,20px 20px,20px 20px,20px 20px,20px 20px,0 0,0 0}
- 75%  {-webkit-mask-size: auto,20px 20px,20px 20px,20px 20px,20px 20px,20px 20px,0 0}
- 90%,
- 100% {-webkit-mask-size: auto,20px 20px,20px 20px,20px 20px,20px 20px,20px 20px,20px 20px}
+  0% {
+    -webkit-mask-size: auto, 0 0, 0 0, 0 0, 0 0, 0 0, 0 0
+  }
+
+  15% {
+    -webkit-mask-size: auto, 20px 20px, 0 0, 0 0, 0 0, 0 0, 0 0
+  }
+
+  30% {
+    -webkit-mask-size: auto, 20px 20px, 20px 20px, 0 0, 0 0, 0 0, 0 0
+  }
+
+  45% {
+    -webkit-mask-size: auto, 20px 20px, 20px 20px, 20px 20px, 0 0, 0 0, 0 0
+  }
+
+  60% {
+    -webkit-mask-size: auto, 20px 20px, 20px 20px, 20px 20px, 20px 20px, 0 0, 0 0
+  }
+
+  75% {
+    -webkit-mask-size: auto, 20px 20px, 20px 20px, 20px 20px, 20px 20px, 20px 20px, 0 0
+  }
+
+  90%,
+  100% {
+    -webkit-mask-size: auto, 20px 20px, 20px 20px, 20px 20px, 20px 20px, 20px 20px, 20px 20px
+  }
 }
 </style>
-
-
-
-
-
-
-
-
-

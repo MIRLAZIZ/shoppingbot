@@ -3,6 +3,8 @@ import HomeView from '../views/HomeView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  mode: history,
+ 
   routes: [
     {
       path: '/',
@@ -33,9 +35,25 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/Success.vue')
     },
-   
+    // {
+    //   path: '/test',
+    //   name: 'test',
+    //   component: () => import('../views/test.vue')
+
+    // }
+
   ]
 })
+
+
+
+
+
+
+
+
+
+
 
 router.beforeEach((to, from, next) => {
   if (to.path === '/') {

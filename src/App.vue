@@ -24,6 +24,14 @@ onMounted(() => {
   } else {
     html[0].classList.add('dark')
   }
+
+
+  
+
+
+    
+      Telegram.WebApp.disableVerticalSwipes();
+    
 })
 
 
