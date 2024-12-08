@@ -17,6 +17,8 @@
 import { onMounted } from 'vue';
 
 
+
+
 onMounted(() => {
   const html = document.getElementsByTagName('html')
   if (window.Telegram.WebApp.colorScheme == 'light') {
@@ -26,11 +28,11 @@ onMounted(() => {
   }
 
 
+
   
 
 
-    
-      Telegram.WebApp.disableVerticalSwipes();
+  
     
 })
 

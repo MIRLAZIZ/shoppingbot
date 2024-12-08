@@ -7,6 +7,7 @@ import { useHomeStore } from '@/stores/home.js'
 import { Search, Close } from '@element-plus/icons-vue'
 import Fuse from 'fuse.js';
 import { useRouter } from 'vue-router'
+import Carousel  from '@/components/Carousel.vue'
 
 const store = useHomeStore()
 
@@ -17,6 +18,7 @@ const loading = ref(false)
 const search = ref(null)
 const searchNot = ref(false)
 const searchInput = ref(null);
+const bg_color = ref(null)
 
 const elementFind = (id) => {
   return store.basket.find(el => el?.variants[0]?.id === id)
@@ -87,7 +89,6 @@ function createFuseSearch(data, keys) {
     includeScore: true
   });
 }
-const router = useRouter()
 
 watch(search, async (newValue) => {
   if (newValue.length > 1) {
@@ -96,48 +97,49 @@ watch(search, async (newValue) => {
     const transliteratedSearchValueToCyrillic = transliterate(searchValueLower, true);
 
     // Create Fuse.js instances for categories and products
-    let fuseCategory = createFuseSearch(store.categordata, ['name']);
+    // let fuseCategory = createFuseSearch(store.categordata, ['name']);
     let fuseProduct = createFuseSearch(store.products, ['name']);
 
     // Search categories
-    let categoryResults = fuseCategory.search(searchValueLower)
-      .concat(fuseCategory.search(transliteratedSearchValueToLatin))
-      .concat(fuseCategory.search(transliteratedSearchValueToCyrillic))
-      .map(result => result.item);
+    // let categoryResults = fuseCategory.search(searchValueLower)
+    //   .concat(fuseCategory.search(transliteratedSearchValueToLatin))
+    //   .concat(fuseCategory.search(transliteratedSearchValueToCyrillic))
+    //   .map(result => result.item);
 
     // Ensure unique results by using a Set
-    categoryResults = Array.from(new Set(categoryResults.map(item => item.id)))
-      .map(id => categoryResults.find(item => item.id === id));
+    // categoryResults = Array.from(new Set(categoryResults.map(item => item.id)))
+    //   .map(id => categoryResults.find(item => item.id === id));
 
-    if (categoryResults.length > 0) {
-      categoryActive(categoryResults[0].id);
+    // if (categoryResults.length > 0) {
+    //   categoryActive(categoryResults[0].id);
+    //   searchNot.value = false;
+    //   await categorizeProducts(store.products);
+    //   await handleProductDataScroll();
+
+    //   categoryScroll(categoryResults[0].id);
+
+    // } 
+    // else {
+    // Search products if no categories are found
+    let productResults = fuseProduct.search(searchValueLower)
+      .concat(fuseProduct.search(transliteratedSearchValueToLatin))
+      .concat(fuseProduct.search(transliteratedSearchValueToCyrillic))
+      .map(result => result.item);
+
+    productResults = Array.from(new Set(productResults.map(item => item.id)))
+      .map(id => productResults.find(item => item.id === id));
+
+    if (productResults.length > 0) {
+      categorizeProducts(productResults);
+      await categoryActive(productResults[0].category_id);
+      await windowScroll();
+
       searchNot.value = false;
-      await categorizeProducts(store.products);
-      await handleProductDataScroll();
-
-      categoryScroll(categoryResults[0].id);
-
     } else {
-      // Search products if no categories are found
-      let productResults = fuseProduct.search(searchValueLower)
-        .concat(fuseProduct.search(transliteratedSearchValueToLatin))
-        .concat(fuseProduct.search(transliteratedSearchValueToCyrillic))
-        .map(result => result.item);
-
-      productResults = Array.from(new Set(productResults.map(item => item.id)))
-        .map(id => productResults.find(item => item.id === id));
-
-      if (productResults.length > 0) {
-        categorizeProducts(productResults);
-        await categoryActive(productResults[0].category_id);
-        await handleProductDataScroll();
-
-        searchNot.value = false;
-      } else {
-        categorizeProducts([]);
-        searchNot.value = true;
-      }
+      categorizeProducts([]);
+      searchNot.value = true;
     }
+    // }
   } else {
     categorizeProducts(store.products);
     searchNot.value = false;
@@ -151,8 +153,13 @@ const prodductType = ref(true)
 const categoryActive = (id) => {
   acteveCategory.value = id
 
-
 }
+
+
+
+
+
+
 const categorizeProducts = (products) => {
   const categorizedData = {};
 
@@ -203,6 +210,10 @@ const updateActiveCategoryOnScroll = () => {
 
 
 
+
+
+
+
 onMounted(() => {
   if (store.categordata.length == 0) {
     store.getCategory()
@@ -219,9 +230,25 @@ onMounted(() => {
 
   }
 
+  windowScroll()
+  bg_color.value = Telegram.WebApp.themeParams.bg_color;
+
 
 
 });
+
+const windowScroll = () => {
+  window.addEventListener('scroll', () => {
+    updateActiveCategoryOnScroll()
+    handleCategoryDataScroll()
+  })
+}
+
+
+
+// computed bg color for dark mode
+
+
 
 
 
@@ -266,25 +293,27 @@ const handleCategoryDataScroll = () => {
 // })
 
 
-const categoryScroll = async (id) => {
-  if (id) {
-    router.push({ hash: '#' + id })
-    await nextTick() // Wait for DOM updates to complete
+// const categoryScroll = async (id) => {
+//   if (id) {
+//     router.push({ hash: '#' + id })
+//     await nextTick() // Wait for DOM updates to complete
 
-    const container = document.getElementById('productsData')
-    const element = document.getElementById(id)
+//     const container = document.getElementById('productsData')
+//     const element = document.getElementById(id)
 
-    if (container && element) {
-      container.scrollTop = element.offsetTop - container.offsetTop + 300
-    }
-  }
-}
+//     if (container && element) {
+//       container.scrollTop = element.offsetTop - container.offsetTop + 300
+//     }
+//   }
+// }
 
-const handleProductDataScroll = () => {
-  updateActiveCategoryOnScroll();
-  handleCategoryDataScroll();
+// const handleProductDataScroll = () => {
+//   console.log('handleProductDataScroll');
 
-};
+//   updateActiveCategoryOnScroll();
+//   handleCategoryDataScroll();
+
+// };
 
 const selectProductType = ref()
 
@@ -292,7 +321,8 @@ const prodductAddbasket = item => {
   if (item.variants.length > 1) {
     prodductType.value = false
     selectProductType.value = item
-
+    // productsData scroll none
+    // document.getElementById('productsData').style.display = 'none'
 
 
   }
@@ -303,6 +333,15 @@ const prodductAddbasket = item => {
   }
 }
 
+watch(prodductType, (newValue) => {
+  if (newValue) {
+    document.getElementById('productsData').style.display = 'block'
+  }
+  else {
+    document.getElementById('productsData').style.display = 'none'
+  }
+})
+
 const addProductCount = (item) => {
 
   if (item.variants.length > 1) {
@@ -311,11 +350,13 @@ const addProductCount = (item) => {
   }
   else {
     store.basket.find(el => el.id === item.id).variants[0].count++
+    item.variants[0].count++
   }
 }
 
 const subtractionProductCount = (item) => {
   const basketItem = store.basket.find(basketItem => basketItem.id === item.id);
+
 
   if (item.variants.length > 1) {
     prodductType.value = false
@@ -325,8 +366,10 @@ const subtractionProductCount = (item) => {
       if (basketItem.variants[0].count === 1) {
         // Remove the item from the basket
         store.basket = store.basket.filter(basketItem => basketItem.variants[0].id !== item.variants[0].id);
+
       } else {
         basketItem.variants[0].count -= 1;
+        item.variants[0].count -= 1;
 
       }
     }
@@ -360,16 +403,18 @@ const subtractionProductCount = (item) => {
   </div>
 
   <div class="relative" v-else>
-    <div class="h-full w-full bg-white  darkClass z-10  absolute transition-all duration-[.5s] "
+    <div class=" w-full bg-white  darkClass z-50  absolute transition-all duration-[.5s] "
       :class="{ productSizewidth: prodductType }">
       <ProductSize @hide="prodductType = true" :selectProductType="selectProductType"
         class="opacity-1 transition-all duration-[.5s]" :class="{ productSizewidthContent: prodductType }" />
     </div>
 
-    <div class="h-auto   py-3">
+    <div class="py-3  top-0 z-10   w-full sticky "
+     :style="`background-color:${bg_color};`" 
+    id="menuElement">
       <div class="flex items-center">
         <img src="@/assets/imgs/logo.png" alt="" class=" h-[80px] ">
-        <h1 class="text-center text-2xl font-bold text-[#6A984D]">Bozorligim</h1>
+        <h1 class="text-center text-2xl font-bold text-[#6A984D]">Bozorligim</h1> 
 
 
       </div>
@@ -390,23 +435,26 @@ const subtractionProductCount = (item) => {
 
 
 
-      <div class="flex overflow-x-auto category  " v-if="store.category.length">
+      <div class="flex overflow-x-auto category    " v-if="store.category.length">
 
         <a v-for="(item, idx) in store.category" :key="item.id" :class="{ 'active': acteveCategory == item.id }"
           :style="`margin-left:${idx === 0 ? '0px' : '10px'}; `" @click=categoryActive(item.id)
-          class="p-1 categoryData border  ml-2" :href="`#${item.id}`" :id="'category' + item.id">
-          <div class=" flex  justify-center ">
-            <div>
+          class="categoryData border  ml-2" :href="`#${item.id}`" :id="'category' + item.id">
+          <!-- <div class=" flex  justify-center h-[100%]  "> -->
+          
 
 
-              <div class=" flex justify-center"><img :src="item.image" alt="" class="categoryImg "></div>
+              <!-- <div class=" flex justify-center border" >   -->
 
-              <div class="ml-2  ">
+                <img :src="item.image" alt="" class="categoryImg  ">
+              <!-- </div> -->
+
+              <!-- <div class="ml-2  ">
                 <p class="font-medium text-[12px] "> {{ item.name }}</p>
-              </div>
+              </div> -->
 
-            </div>
-          </div>
+         
+          <!-- </div> -->
         </a>
 
       </div>
@@ -419,8 +467,9 @@ const subtractionProductCount = (item) => {
 
 
     <!-- products data  -->
-    <div class="  overflow-y-scroll  productsData    pb-16 relative " @scroll="handleProductDataScroll($event)"
-      id="productsData">
+
+    <Carousel />
+    <div class="  productsData    pb-16 relative " id="productsData">
       <button class="fixed bottom-6 right-6 bg-[#6A984D] w-12 h-12 rounded-full " @click="$router.push('/basket')"> <img
           src="@/assets/imgs/karzinka2.png" alt="">
         <small
@@ -455,7 +504,10 @@ const subtractionProductCount = (item) => {
             </div>
             <!-- product name  -->
             <div style="width: 75%;">
-              <p class="mb-2 ml-2 font-bold text-[14px]">{{ item.name }} {{ item.weight }} {{ item.type1 }}</p>
+              <p class="mb-2 ml-2 font-bold text-[14px]">
+                {{ item.name }}
+                {{ item.weight }}
+                {{ item.type1 }}</p>
               <p class="mb-2 ml-2">{{ item.subtitre }} </p>
               <div class="flex items-center justify-between ml-2">
                 <p class="font-bold"> {{ store.formatPrice(item.variants[0].price) }} so'm</p>
@@ -558,10 +610,13 @@ const subtractionProductCount = (item) => {
 } */
 
 
-.categoryImg {
-  width: 40px;
-  height: 40px;
+
+.productCategory {
+  scroll-margin-top: 250px;
 }
+
+
+
 
 .category::-webkit-scrollbar {
   display: none;
@@ -581,9 +636,12 @@ const subtractionProductCount = (item) => {
 }
 
 .active {
-  background-color: #6A984D;
-  border-radius: 5px;
-  color: #fff;
+  /* background-color: #6A984D; */
+  /* border-radius: 5px; */
+  /* color: #fff; */
+  border: 2px solid #6A984D;
+  /* padding: 3px; */
+  /* outline: 3px solid #6A984D; */
 
 }
 
@@ -594,10 +652,18 @@ const subtractionProductCount = (item) => {
 }
 
 .categoryData {
-  min-width: 105px !important;
+  min-width: 80px !important;
+  height: 80px !important;
   border-radius: 5px;
   transition: all 0.2s;
   /* scroll-behavior: smooth; */
+}
+.categoryData img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 5px;
+  /* transition: all 0.2s; */
 }
 
 
@@ -606,9 +672,9 @@ const subtractionProductCount = (item) => {
   display: none;
 }
 
-.productsData {
-  height: calc(100vh - 290px);
-}
+/*.productsData {
+  height: calc(100vh - 200px);
+}*/
 
 .productImg {
   /* width: 100px; */

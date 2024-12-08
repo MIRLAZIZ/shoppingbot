@@ -50,7 +50,7 @@
           <div ><p class="text-red-500 text-end text-[13px]">{{ errorMessage }}</p></div>
         <div class="flex justify-end">
             <button @click="resetForm" class="btn bg-red-500 py-1">Orqaga</button>
-            <button @click="sendData" class="btn ml-3 py-1">Ma'lumotlarni yuborish</button>
+            <button @click="sendData" class="btn ml-3 py-1" :disabled="isSubmit">Ma'lumotlarni yuborish</button>
         </div>
 
 
@@ -125,12 +125,14 @@ const formatPhoneNumber = (phoneNumber) => {
 
 
 const router = useRouter()
+const isSubmit = ref(false)
 
 const sendData = () => {
     phoneValidation()
     peymentValidation()
     requiredFullnameFunction()
     if (!phoneRequired.value && !requiredPeymentType.value && !requiredFullname.value) {
+        isSubmit.value = true
         store.createOrder(userData.value)
             .then(res => {
                 store.basket = []
@@ -144,6 +146,7 @@ const sendData = () => {
             .catch(err => {
                errorMessage.value = err.response.data.message
                errorData.value = err.response.data.errors
+               isSubmit.value = false
                 
                 console.log(err)
             })

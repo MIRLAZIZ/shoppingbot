@@ -55,12 +55,12 @@ const router = createRouter({
 
 
 
-router.beforeEach((to, from, next) => {
-  if (to.path === '/') {
-    document.body.style.overflowY = 'hidden';
-  } else {
-    document.body.style.overflowY = 'auto';
-  }
-  next();
-});
+// router.beforeEach((to, from, next) => {
+//   if (to.path === '/') {
+//     document.body.style.overflowY = 'hidden';
+//   } else {
+//     document.body.style.overflowY = 'auto';
+//   }
+//   next();
+// });
 export default router

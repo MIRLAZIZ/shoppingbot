@@ -1,14 +1,22 @@
 <script setup>
-import { ref } from 'vue';
+
+
+
+
+import { ref, onMounted } from 'vue'
 import { useHomeStore } from '@/stores/home.js'
 import { useRouter } from 'vue-router'
+
+
+
 const store = useHomeStore()
 const router = useRouter()
-
 const code = ref('')
-
 const totalSum = ref(false)
 const discount = ref(0)
+
+
+
 
 
 const sendOrder = () => {
@@ -37,6 +45,12 @@ const totalPrice = () => {
 const homePage = () => {
   router.push('/')
 }
+
+
+
+
+
+
 </script>
 
 <template>
@@ -155,7 +169,7 @@ const homePage = () => {
             <p>Umumiy narx</p>
             <p> {{ store.formatPrice(!store.code?.status ? totalPrice() : totalPrice() - (totalPrice() *
               (store.code?.data[0]?.discount /
-              100)) )}} sum</p>
+                100))) }} sum</p>
           </div>
         </div>
 
@@ -172,8 +186,20 @@ const homePage = () => {
 
 
 
+
+
       </div>
     </div>
+
+
+
+
+    
+
+
+
+    
+
   </div>
 
 
@@ -206,4 +232,10 @@ const homePage = () => {
 .productSizewidthContent {
   opacity: 0;
 }
+
+
+
+
+
+
 </style>

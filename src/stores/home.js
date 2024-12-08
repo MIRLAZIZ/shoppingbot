@@ -11,7 +11,8 @@ export const useHomeStore = defineStore('home', {
     productData: {},
     orderData: [],
     products: [],
-    code: null
+    code: null,
+    news: []
   }),
   actions: {
     async getCategory() {
@@ -41,6 +42,12 @@ export const useHomeStore = defineStore('home', {
 
     formatPrice(number) {
       return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    },
+   async getNews() {
+      return  await api.get('/news')
+      .then(res => {
+        this.news = res.data
+      })
     }
 
 

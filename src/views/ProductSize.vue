@@ -1,4 +1,5 @@
 <template>
+
   <div class=" overflow-y-scroll h-screen  prouductSize"
     v-if="props.selectProductType && props.selectProductType.variants">
 
@@ -30,7 +31,7 @@
     </div>
 
     <!-- product name  -->
-    <h1 class="mb-2  text-[18px]"> {{ props.selectProductType?.name }}</h1>
+    <h1 class="mb-2  text-[18px]"> {{ props.selectProductType.variants[variantIndex].criterion }}</h1>
     <hr />
 
 
