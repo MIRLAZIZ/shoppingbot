@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Carousel v-bind="config" class="my-5 " :wrap-around="true" autoplay="3000" >
+        <Carousel v-bind="config" class="my-5 " :wrap-around="true" :autoplay="isPlaying ? false : 3000" >
             <Slide v-for="slide in store.news.news" :key="slide.id" >
                 <div class="d-flex w-[100%]">
                     <!-- <h3>{{ slide.title }}</h3> -->
@@ -8,7 +8,7 @@
                     <div>
                         <img :src="slide.file" alt="" class=" w-[100%]" v-if="handleFile(slide.file)">
 
-                        <video v-else controls >
+                        <video v-else controls @play="isPlaying = true" @pause="isPlaying = false">
 
 
                             <source :src="slide.file" type="video/mp4">
@@ -40,6 +40,8 @@ const store = useHomeStore()
 const config = {
     itemsToShow: 1,
 }
+
+const isPlaying = ref(false)
 
 const handleFile = (file) => {
 
