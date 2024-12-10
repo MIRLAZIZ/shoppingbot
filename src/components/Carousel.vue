@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Carousel v-bind="config" class="my-5 " :wrap-around="true" :autoplay="isPlaying ? false : 3000" >
+        <Carousel v-bind="config" class="my-5 " :wrap-around="true" :autoplay="isPlaying ? 0 : 4000"  v-if="store.news.news">
             <Slide v-for="slide in store.news.news" :key="slide.id" >
                 <div class="d-flex w-[100%]">
                     <!-- <h3>{{ slide.title }}</h3> -->
@@ -40,6 +40,7 @@ const store = useHomeStore()
 const config = {
     itemsToShow: 1,
 }
+store.news.news = []
 
 const isPlaying = ref(false)
 
@@ -61,6 +62,7 @@ const handleFile = (file) => {
 }
 onMounted(() => {
   store.getNews()
+  
 
 })
 
